@@ -1,0 +1,101 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Sign Up | EarthScape Climate Analytics{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <div class="auth-logo">
+                <i class="bi bi-globe2"></i>
+            </div>
+            <h2 class="auth-title">Create Account</h2>
+            <p class="auth-subtitle">Join EarthScape and explore climate insights</p>
+        </div>
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <i class="bi bi-person"></i> Username
+                </label>
+                <input type="text" 
+                       name="username" 
+                       id="username" 
+                       class="form-control" 
+                       placeholder="Choose a username"
+                       required>
+                <div class="form-hint">At least 3 characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="bi bi-envelope"></i> Email Address
+                </label>
+                <input type="email" 
+                       name="email" 
+                       id="email" 
+                       class="form-control" 
+                       placeholder="your@email.com"
+                       required>
+                <div class="form-hint">We'll never share your email</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="bi bi-lock"></i> Password
+                </label>
+                <input type="password" 
+                       name="password" 
+                       id="password" 
+                       class="form-control" 
+                       placeholder="Create a strong password"
+                       required>
+                <div class="form-hint">Minimum 8 characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">
+                    <i class="bi bi-check-circle"></i> Confirm Password
+                </label>
+                <input type="password" 
+                       name="confirm_password" 
+                       id="confirm_password" 
+                       class="form-control" 
+                       placeholder="Confirm your password"
+                       required>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-auth w-100">
+                <i class="bi bi-person-plus-fill"></i> Sign Up
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="/login/" class="auth-link">Login here</a></p>
+        </div>
+        
+        <div class="auth-features">
+            <div class="feature-item">
+                <i class="bi bi-cloud-check"></i>
+                <span>Real-time climate data</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-graph-up"></i>
+                <span>Advanced analytics</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-shield-check"></i>
+                <span>Secure access</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
