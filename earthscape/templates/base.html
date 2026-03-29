@@ -209,18 +209,18 @@
                 <a href="/dashboard/" class="nav-link-custom {% block dashboard_active %}{% endblock %} mt-3">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <a href="#" class="nav-link-custom {% block analysis_active %}{% endblock %}">
+               <a href="/dashboard/analysis/" class="nav-link-custom {% block analysis_active %}{% endblock %}">
                     <i class="bi bi-graph-up"></i> Analysis
                 </a>
-                <a href="#" class="nav-link-custom {% block charts_active %}{% endblock %}">
+               <a href="/dashboard/charts/" class="nav-link-custom {% block charts_active %}{% endblock %}">
                     <i class="bi bi-bar-chart-steps"></i> Charts
                 </a>
-                <a href="#" class="nav-link-custom {% block climate_models_active %}{% endblock %}">
-                    <i class="bi bi-cloud-sun"></i> Climate Models
+                <a href="/dashboard/predictions/" class="nav-link-custom {% block climate_models_active %}{% endblock %}">
+                    <i class="bi bi-robot"></i> AI Predictions
                 </a>
-                <a href="#" class="nav-link-custom {% block geospatial_active %}{% endblock %}">
+                <!-- <a href="#" class="nav-link-custom {% block geospatial_active %}{% endblock %}">
                     <i class="bi bi-map"></i> Geospatial
-                </a>
+                </a> -->
             </div>
             <div class="logout-btn">
                 <a href="/logout/" class="nav-link-custom text-white">
@@ -246,6 +246,7 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 {% block extra_js %}{% endblock %}
 

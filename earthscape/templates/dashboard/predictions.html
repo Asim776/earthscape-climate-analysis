@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Predictions | EarthScape{% endblock %}
+{% block climate_models_active %}active{% endblock %}
+
+{% block content %}
+
+<h2 class="fw-bold mb-4">🤖 AI Climate Prediction</h2>
+
+<div class="row">
+
+    <!-- INPUT -->
+    <div class="col-md-5">
+        <div class="card p-4 shadow-sm border-0">
+
+            <h5 class="mb-3">Enter Climate Data</h5>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>CO₂ (ppm)</label>
+                    <input type="number" step="0.1" name="co2" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Humidity (%)</label>
+                    <input type="number" step="0.1" name="humidity" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Rainfall (mm)</label>
+                    <input type="number" step="0.1" name="rainfall" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Year</label>
+                    <input type="number" name="year" class="form-control" required>
+                </div>
+
+                <select name="month" class="form-control" required>
+    <option value="1">Jan</option>
+    <option value="2">Feb</option>
+    <option value="3">Mar</option>
+    <option value="4">Apr</option>
+    <option value="5">May</option>
+    <option value="6">June</option>
+    <option value="7">July</option>
+    <option value="8">Aug</option>
+    <option value="9">Sep</option>
+    <option value="10">Oct</option>
+    <option value="11">Nov</option>
+    <option value="12">Dec</option>
+</select>
+
+                <button class="btn btn-primary w-100">
+                    🔍 Predict Temperature
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="col-md-7">
+        <div class="card p-4 shadow-sm border-0 text-center">
+
+            <h5 class="mb-3">Prediction Result</h5>
+
+            {% if prediction %}
+                <h1 class="display-4 text-success">{{ prediction }}°C</h1>
+
+                <span class="badge bg-info">
+                    Model Confidence: {{ accuracy }}%
+                </span>
+
+            {% else %}
+                <p class="text-muted">Enter values to generate prediction</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 📊 GRAPH -->
+<div class="card p-4 shadow-sm border-0 mt-4">
+    <h5 class="fw-semibold mb-3">📈 Temperature Trend + Prediction</h5>
+    <canvas id="predictionChart"></canvas>
+</div>
+
+{{ months|json_script:"months-data" }}
+{{ temps|json_script:"temps-data" }}
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const months = JSON.parse(document.getElementById('months-data').textContent);
+const temps = JSON.parse(document.getElementById('temps-data').textContent);
+
+new Chart(document.getElementById('predictionChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Temperature',
+            data: temps,
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true
+        }]
+    }
+});
+</script>
+
+{% endblock %}

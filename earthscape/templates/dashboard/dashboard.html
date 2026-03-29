@@ -1,334 +1,192 @@
 {% extends 'base.html' %}
 
 {% block title %}EarthScape Dashboard | Climate Analytics{% endblock %}
-
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
 
-<!-- Header with greeting and date -->
+<!-- Header -->
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="display-6 fw-bold" style="color: #0a2b3c;">Climate Intelligence Dashboard</h1>
-        <p class="text-muted mt-1">Big Data insights · Real-time anomalies · Predictive analytics</p>
+        <h1 class="display-6 fw-bold text-dark">Climate Intelligence Dashboard</h1>
+        <p class="text-muted">Big Data insights · Real-time anomalies · Predictive analytics</p>
     </div>
-    <div class="bg-white rounded-4 p-3 shadow-sm d-flex align-items-center">
-        <i class="bi bi-calendar3 fs-4 me-2 text-info"></i>
-        <span class="fw-semibold" id="liveDate"></span>
-        <span class="mx-2">|</span>
-        <i class="bi bi-cloud-fill text-primary"></i>
-        <span class="ms-1 small">ESA · NASA datasets</span>
+    <div class="bg-white rounded-4 p-3 shadow-sm">
+        <i class="bi bi-calendar3 me-2 text-info"></i>
+        <span id="liveDate"></span>
     </div>
 </div>
 
-<!-- 3 main stat cards -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="stat-card p-4">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-label">TOTAL EARTH RECORDS</div>
-                    <div class="stat-value mt-2" id="totalRecordsValue">2.84M</div>
-                    <div class="mt-2"><span class="trend-badge"><i class="bi bi-arrow-up-short"></i> +12.4%</span> <span class="text-muted small ms-2">vs last month</span></div>
-                </div>
-                <div class="card-icon">
-                    <i class="bi bi-database-fill-gear"></i>
-                </div>
-            </div>
-            <div class="progress mt-3" style="height: 6px;">
-                <div class="bg-info" style="width: 78%; border-radius: 4px;"></div>
-            </div>
-            <div class="small text-secondary mt-2"><i class="bi bi-satellite"></i> Satellite & ground stations</div>
+<p>User: {{ request.user }}</p>
+
+<!-- 🔍 FILTERS -->
+<div class="card shadow-sm p-3 mb-4 border-0">
+    <form method="GET" class="row g-3 align-items-end">
+
+        <!-- Year Filter -->
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Filter by Year</label>
+            <select name="year" class="form-select">
+                <option value="">All Years</option>
+                {% for year in years %}
+                    <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>
+                        {{ year }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stat-card p-4">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-label">ANOMALIES DETECTED</div>
-                    <div class="stat-value mt-2" id="anomaliesValue">147</div>
-                    <div class="mt-2"><span class="trend-badge bg-danger bg-opacity-10 text-danger"><i class="bi bi-exclamation-triangle"></i> +8 high severity</span></div>
-                </div>
-                <div class="card-icon" style="background:#ffe8e6; color:#dc3545;">
-                    <i class="bi bi-exclamation-diamond"></i>
-                </div>
-            </div>
-            <div class="mt-2 small">🔥 Heatwave spikes · Methane leaks · Deforestation alerts</div>
+
+        <!-- Region Filter -->
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Filter by Region</label>
+            <select name="region" class="form-select">
+                <option value="">All Regions</option>
+                {% for region in regions %}
+                    <option value="{{ region }}" {% if selected_region == region %}selected{% endif %}>
+                        {{ region }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stat-card p-4">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-label">GLOBAL AVG TEMPERATURE</div>
-                    <div class="stat-value mt-2" id="avgTempValue">15.8<span style="font-size:1.2rem;">°C</span></div>
-                    <div class="mt-2"><span class="trend-badge bg-warning bg-opacity-10 text-warning-emphasis"><i class="bi bi-thermometer-half"></i> +0.32°C anomaly</span></div>
-                </div>
-                <div class="card-icon" style="background:#fff0db; color:#e67e22;">
-                    <i class="bi bi-thermometer-sun"></i>
-                </div>
-            </div>
-            <div class="small text-secondary mt-2">Baseline 1951-1980: +1.18°C above pre-industrial</div>
+
+        <!-- Buttons -->
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-50">
+                Apply Filters
+            </button>
+            <a href="/dashboard/" class="btn btn-outline-secondary w-50">
+                Reset
+            </a>
         </div>
-    </div>
+
+    </form>
 </div>
 
-<!-- Charts Row -->
+<!-- Cards -->
 <div class="row g-4 mb-4">
-    <div class="col-lg-7">
-        <div class="chart-container p-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h5 class="fw-semibold"><i class="bi bi-bar-chart-line-fill me-2 text-primary"></i> Temperature Anomaly Trend (2023-2025)</h5>
-                <span class="badge bg-light text-dark border">Big Data Aggregation</span>
-            </div>
-            <canvas id="climateTrendChart" style="max-height: 280px; width:100%"></canvas>
-            <div class="small text-secondary mt-2"><i class="bi bi-info-circle"></i> Monthly land-ocean temperature index (NASA GISTEMP v4)</div>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 border-0">
+            <h6 class="text-muted">TOTAL RECORDS</h6>
+            <h3 class="fw-bold">{{ total_records }}</h3>
         </div>
     </div>
-    <div class="col-lg-5">
-        <div class="chart-container p-3 h-100 d-flex flex-column">
-            <h5 class="fw-semibold"><i class="bi bi-pie-chart-fill me-2 text-success"></i> Anomaly Breakdown by Region</h5>
-            <canvas id="anomalyPieChart" style="max-height: 240px; width:100%"></canvas>
-            <div class="mt-auto small text-secondary mt-3">
-                <i class="bi bi-globe2"></i> Based on real-time Earth Observation (EO) data streams
-            </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 border-0">
+            <h6 class="text-muted">ANOMALIES DETECTED</h6>
+            <h3 class="fw-bold text-danger">{{ anomalies_count }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 border-0">
+            <h6 class="text-muted">AVG TEMPERATURE</h6>
+            <h3 class="fw-bold text-warning">{{ avg_temp }}°C</h3>
         </div>
     </div>
 </div>
 
-<!-- Climate Health Metrics Row -->
-<div class="row g-4">
-    <div class="col-md-6 col-lg-4">
-        <div class="insight-card p-4 h-100">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <i class="bi bi-droplet-half fs-1 text-info"></i>
-                <div>
-                    <h6 class="mb-0 fw-bold">Sea Level Rise</h6>
-                    <small class="text-secondary">Satellite altimetry</small>
-                </div>
-            </div>
-            <div class="display-6 fw-semibold">3.8<span class="fs-5"> mm/yr</span></div>
-            <div class="mt-2">Accelerating trend +0.12 mm/yr² | 212 mm since 1993</div>
-            <div class="progress mt-3" style="height: 5px;"><div class="bg-danger" style="width: 68%;"></div></div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-        <div class="insight-card p-4 h-100">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <i class="bi bi-tree-fill fs-1 text-success"></i>
-                <div>
-                    <h6 class="mb-0 fw-bold">Carbon Flux (NetCO₂)</h6>
-                    <small class="text-secondary">FLUXCOM + OCO-2</small>
-                </div>
-            </div>
-            <div class="display-6 fw-semibold">412.5<span class="fs-5"> ppm</span></div>
-            <div class="mt-2">Monthly average CO₂ concentration | +2.9 ppm/year</div>
-            <div class="trend-badge mt-2 bg-danger bg-opacity-10 text-danger">Critical threshold</div>
-        </div>
-    </div>
-    <div class="col-md-12 col-lg-4">
-        <div class="insight-card p-4 h-100">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <i class="bi bi-lightning-charge-fill fs-1 text-warning"></i>
-                <div>
-                    <h6 class="mb-0 fw-bold">Extreme Weather Events</h6>
-                    <small class="text-secondary">2025 real-time anomalies</small>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between">
-                <div><span class="fw-bold fs-4">23</span> <br>wildfires</div>
-                <div><span class="fw-bold fs-4">12</span> <br>hurricanes</div>
-                <div><span class="fw-bold fs-4">47</span> <br>flood alerts</div>
-            </div>
-            <div class="small text-secondary mt-2"><i class="bi bi-arrow-repeat"></i> +34% compared to 2023 baseline</div>
-        </div>
-    </div>
+<!-- Chart -->
+<div class="card shadow-sm p-4 mb-5 border-0">
+    <h5 class="fw-semibold mb-3">Temperature Trend</h5>
+    <canvas id="climateTrendChart"></canvas>
 </div>
 
-<!-- Anomaly Events Table -->
-<div class="mt-5">
-    <div class="d-flex justify-content-between align-items-center">
-        <h5 class="section-title"><i class="bi bi-table me-2"></i> Recent Anomaly Events (Big Data Stream)</h5>
-        <button class="btn btn-sm btn-outline-info rounded-pill" id="refreshDataBtn">
-            <i class="bi bi-arrow-repeat"></i> Simulate Refresh
-        </button>
+<!-- Anomaly Table -->
+<div class="card shadow-sm p-4 border-0 mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-semibold mb-0">🚨 Detected Anomalies</h5>
+        <span class="badge bg-danger">{{ anomalies_count }} Alerts</span>
     </div>
-    <div class="table-responsive bg-white rounded-4 shadow-sm p-2">
-        <table class="table table-hover align-middle mb-0">
+
+    {% if anomaly_data %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
+                    <th>Year</th>
+                    <th>Month</th>
                     <th>Region</th>
-                    <th>Anomaly Type</th>
-                    <th>Intensity</th>
-                    <th>Timestamp (UTC)</th>
-                    <th>Confidence</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>CO2</th>
+                    <th>Rainfall</th>
                 </tr>
             </thead>
-            <tbody id="anomalyTableBody">
-                <tr><td colspan="5" class="text-center">Loading climate data...</td></tr>
+            <tbody>
+                {% for row in anomaly_data %}
+                <tr>
+                    <td>{{ row.Year }}</td>
+                    <td>{{ row.Month }}</td>
+                    <td>{{ row.Region }}</td>
+                    <td class="text-danger fw-bold">{{ row.temperature }}°C</td>
+                    <td>{{ row.humidity }}%</td>
+                    <td>{{ row.co2 }} ppm</td>
+                    <td>{{ row.rainfall }} mm</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
-    <div class="mt-3 d-flex justify-content-between">
-        <div><i class="bi bi-cloud-check"></i> Data source: Copernicus Climate Data Store + Sentinel-5P</div>
-        <div><span class="badge bg-secondary">last update: real-time simulation</span></div>
-    </div>
+    {% else %}
+        <div class="alert alert-success text-center">
+            ✅ No anomalies detected in dataset
+        </div>
+    {% endif %}
 </div>
+
+<!-- SAFE DATA -->
+{{ dates|json_script:"dates-data" }}
+{{ temps|json_script:"temps-data" }}
 
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    // Set live date
-    function updateDate() {
-        const now = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, options);
-    }
-    updateDate();
 
-    // Temperature Anomaly Chart
-    const ctxLine = document.getElementById('climateTrendChart').getContext('2d');
-    const months = ['Jan 2023', 'Apr 2023', 'Jul 2023', 'Oct 2023', 'Jan 2024', 'Apr 2024', 'Jul 2024', 'Oct 2024', 'Jan 2025', 'Apr 2025', 'Jul 2025'];
-    const tempAnomalies = [0.85, 0.92, 1.02, 1.10, 1.18, 1.25, 1.32, 1.40, 1.48, 1.55, 1.63];
-    
-    let climateChart = new Chart(ctxLine, {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Date
+    document.getElementById('liveDate').innerText = new Date().toDateString();
+
+    // Data from backend
+    const months = JSON.parse(document.getElementById('dates-data').textContent);
+    const temps = JSON.parse(document.getElementById('temps-data').textContent);
+
+    // Detect anomalies visually (simple threshold)
+    const anomalyPoints = temps.map(val => val > (Math.max(...temps) * 0.9) ? val : null);
+
+    const ctx = document.getElementById('climateTrendChart').getContext('2d');
+
+    new Chart(ctx, {
         type: 'line',
         data: {
             labels: months,
-            datasets: [{
-                label: 'Temperature Anomaly (°C)',
-                data: tempAnomalies,
-                borderColor: '#e67e22',
-                backgroundColor: 'rgba(230, 126, 34, 0.05)',
-                borderWidth: 3,
-                pointRadius: 4,
-                pointBackgroundColor: '#1e6f9f',
-                pointBorderColor: '#fff',
-                pointHoverRadius: 7,
-                fill: true,
-                tension: 0.3
-            }]
+            datasets: [
+                {
+                    label: 'Temperature',
+                    data: temps,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Anomalies',
+                    data: anomalyPoints,
+                    pointRadius: 6,
+                    showLine: false
+                }
+            ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
             plugins: {
-                tooltip: { callbacks: { label: (ctx) => `${ctx.raw}°C above baseline` } },
-                legend: { position: 'top' }
-            },
-            scales: { y: { title: { display: true, text: 'Anomaly (°C)' }, grid: { color: '#e9ecef' } } }
-        }
-    });
-
-    // Regional Anomaly Pie Chart
-    const pieCtx = document.getElementById('anomalyPieChart').getContext('2d');
-    let anomalyPieChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: ['North America', 'Europe', 'Asia-Pacific', 'Africa', 'South America', 'Polar Regions'],
-            datasets: [{
-                data: [34, 21, 42, 18, 15, 17],
-                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
-        }
-    });
-
-    // Anomaly Events Data
-    let anomalyEvents = [
-        { region: 'Amazon Basin', type: 'Deforestation Spike', intensity: 'Critical', timestamp: '2025-03-21 08:23:12', confidence: '98%' },
-        { region: 'Southern Europe', type: 'Heatwave (44°C)', intensity: 'Extreme', timestamp: '2025-03-20 14:47:01', confidence: '96%' },
-        { region: 'Antarctic Peninsula', type: 'Ice Shelf Melt', intensity: 'Accelerated', timestamp: '2025-03-19 22:15:33', confidence: '92%' },
-        { region: 'South-East Asia', type: 'Flood Risk', intensity: 'High', timestamp: '2025-03-21 06:02:19', confidence: '87%' },
-        { region: 'California, USA', type: 'Wildfire Outbreak', intensity: 'Severe', timestamp: '2025-03-20 18:30:45', confidence: '94%' },
-        { region: 'Arctic Circle', type: 'Permafrost Thaw', intensity: 'Record', timestamp: '2025-03-19 09:12:07', confidence: '99%' }
-    ];
-
-    function renderAnomalyTable() {
-        const tbody = document.getElementById('anomalyTableBody');
-        tbody.innerHTML = '';
-        anomalyEvents.forEach(event => {
-            let intensityBadge = '';
-            if (event.intensity === 'Critical' || event.intensity === 'Extreme' || event.intensity === 'Severe') {
-                intensityBadge = `<span class="badge bg-danger bg-opacity-10 text-danger">${event.intensity}</span>`;
-            } else if (event.intensity === 'High') {
-                intensityBadge = `<span class="badge bg-warning bg-opacity-10 text-warning">${event.intensity}</span>`;
-            } else {
-                intensityBadge = `<span class="badge bg-secondary">${event.intensity}</span>`;
+                legend: {
+                    position: 'top'
+                }
             }
-            const row = `
-                <tr>
-                    <td class="fw-semibold"><i class="bi bi-geo-alt-fill text-secondary me-1"></i> ${event.region}</td>
-                    <td>${event.type}</td>
-                    <td>${intensityBadge}</td>
-                    <td class="small">${event.timestamp}</td>
-                    <td><span class="fw-bold">${event.confidence}</span></td>
-                </tr>
-            `;
-            tbody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-    renderAnomalyTable();
-
-    // Refresh Dashboard Data (simulate real-time updates)
-    function refreshDashboardData() {
-        let newRecords = (2.75 + Math.random() * 0.3).toFixed(2) + 'M';
-        document.getElementById('totalRecordsValue').innerText = newRecords;
-        
-        let newAnomalies = Math.floor(140 + Math.random() * 40);
-        document.getElementById('anomaliesValue').innerText = newAnomalies;
-        
-        let newTemp = (15.4 + Math.random() * 0.9).toFixed(1);
-        document.getElementById('avgTempValue').innerHTML = newTemp + '<span style="font-size:1.2rem;">°C</span>';
-        
-        const randomEvent = {
-            region: ['North Atlantic', 'Sahara Desert', 'Himalayas', 'Great Barrier Reef', 'Siberia'][Math.floor(Math.random()*5)],
-            type: ['Flash Drought', 'Marine Heatwave', 'Glacial Outburst', 'CO₂ Spike', 'Aerosol Anomaly'][Math.floor(Math.random()*5)],
-            intensity: ['Critical', 'High', 'Moderate', 'Extreme'][Math.floor(Math.random()*4)],
-            timestamp: new Date().toISOString().slice(0,19).replace('T', ' '),
-            confidence: (85 + Math.floor(Math.random()*14)) + '%'
-        };
-        anomalyEvents.unshift(randomEvent);
-        if (anomalyEvents.length > 6) anomalyEvents.pop();
-        renderAnomalyTable();
-        
-        const newPieData = [28 + Math.floor(Math.random()*10), 18 + Math.floor(Math.random()*8), 38 + Math.floor(Math.random()*8), 14 + Math.floor(Math.random()*6), 12 + Math.floor(Math.random()*6), 15 + Math.floor(Math.random()*5)];
-        anomalyPieChart.data.datasets[0].data = newPieData;
-        anomalyPieChart.update();
-        
-        let newAnomalyVal = (1.55 + Math.random() * 0.12).toFixed(2);
-        if(climateChart.data.labels[climateChart.data.labels.length-1] !== 'Oct 2025') {
-            climateChart.data.labels.push('Oct 2025');
-            climateChart.data.datasets[0].data.push(parseFloat(newAnomalyVal));
-            if(climateChart.data.labels.length > 12) {
-                climateChart.data.labels.shift();
-                climateChart.data.datasets[0].data.shift();
-            }
-            climateChart.update();
-        } else {
-            climateChart.data.datasets[0].data[climateChart.data.datasets[0].data.length-1] = parseFloat(newAnomalyVal);
-            climateChart.update();
         }
-    }
-    
-    document.getElementById('refreshDataBtn').addEventListener('click', () => {
-        refreshDashboardData();
-        const btn = document.getElementById('refreshDataBtn');
-        btn.innerHTML = '<i class="bi bi-check2-circle"></i> Updated!';
-        setTimeout(() => btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Simulate Refresh', 1200);
     });
-    
-    setInterval(() => {
-        refreshDashboardData();
-    }, 45000);
-    
-    setTimeout(() => {
-        refreshDashboardData();
-    }, 2000);
 </script>
+
 {% endblock %}

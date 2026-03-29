@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Analysis | EarthScape{% endblock %}
+{% block analysis_active %}active{% endblock %}
+
+{% block content %}
+
+<h2 class="fw-bold mb-4">📊 Climate Analysis</h2>
+
+<!-- 🔍 Filters -->
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <select name="year" class="form-select">
+            <option value="">Select Year</option>
+            {% for y in years %}
+                <option value="{{ y }}" {% if y|stringformat:"s" == selected_year %}selected{% endif %}>
+                    {{ y }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="region" class="form-select">
+            <option value="">Select Region</option>
+            {% for r in regions %}
+                <option value="{{ r }}" {% if r == selected_region %}selected{% endif %}>
+                    {{ r }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100">Apply</button>
+    </div>
+    
+</form>
+
+<!-- 📊 Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card p-3">
+            <div class="stat-label">AVG TEMP</div>
+            <div class="stat-value">{{ avg_temp }}°C</div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card p-3">
+            <div class="stat-label">MAX TEMP</div>
+            <div class="stat-value text-danger">{{ max_temp }}°C</div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card p-3">
+            <div class="stat-label">MIN TEMP</div>
+            <div class="stat-value text-info">{{ min_temp }}°C</div>
+        </div>
+    </div>
+</div>
+
+<!-- 📈 Charts Grid -->
+<div class="row g-4">
+
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>🌡 Temperature Trend</h6>
+            <canvas id="tempChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>💧 Humidity Trend</h6>
+            <canvas id="humidityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>🌫 CO₂ Levels</h6>
+            <canvas id="co2Chart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>🌧 Rainfall Trend</h6>
+            <canvas id="rainfallChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- SAFE DATA -->
+{{ months|json_script:"months-data" }}
+{{ temps|json_script:"temps-data" }}
+{{ humidity|json_script:"humidity-data" }}
+{{ co2|json_script:"co2-data" }}
+{{ rainfall|json_script:"rainfall-data" }}
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const months = JSON.parse(document.getElementById('months-data').textContent);
+const temps = JSON.parse(document.getElementById('temps-data').textContent);
+const humidity = JSON.parse(document.getElementById('humidity-data').textContent);
+const co2 = JSON.parse(document.getElementById('co2-data').textContent);
+const rainfall = JSON.parse(document.getElementById('rainfall-data').textContent);
+
+// 🌡 Temperature Chart
+new Chart(document.getElementById('tempChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{ label: 'Temperature', data: temps }]
+    }
+});
+
+// 💧 Humidity Chart
+new Chart(document.getElementById('humidityChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{ label: 'Humidity', data: humidity }]
+    }
+});
+
+// 🌫 CO2 Chart
+new Chart(document.getElementById('co2Chart'), {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{ label: 'CO2', data: co2 }]
+    }
+});
+
+// 🌧 Rainfall Chart
+new Chart(document.getElementById('rainfallChart'), {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{ label: 'Rainfall', data: rainfall }]
+    }
+});
+</script>
+
+{% endblock %}

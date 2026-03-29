@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Charts | EarthScape{% endblock %}
+{% block charts_active %}active{% endblock %}
+
+{% block content %}
+
+<h2 class="fw-bold mb-4">📊 Data Visualization Hub</h2>
+
+<div class="row g-4">
+
+    <!-- 🌡 Line Chart -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>Temperature Trend</h6>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 📊 Bar Chart -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>Humidity Comparison</h6>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 🥧 Pie Chart -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>Rainfall Distribution</h6>
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 🎯 Scatter Plot -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm border-0">
+            <h6>Temperature vs CO₂</h6>
+            <canvas id="scatterChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🔥 HEATMAP -->
+<div class="card p-3 shadow-sm border-0 mt-4">
+    <h6>🔥 Temperature Heatmap (Region vs Month)</h6>
+    <div id="heatmapChart"></div>
+</div>
+
+<!-- 🧠 CORRELATION MATRIX -->
+<div class="card p-3 shadow-sm border-0 mt-4">
+    <h6>🧠 Correlation Matrix</h6>
+    <div id="corrChart"></div>
+</div>
+
+<!-- 📦 BOX PLOT -->
+<div class="card p-3 shadow-sm border-0 mt-4">
+    <h6>📦 Data Distribution (Box Plot)</h6>
+    <div id="boxChart"></div>
+</div>
+
+<!-- SAFE DATA -->
+{{ months|json_script:"months-data" }}
+{{ temps|json_script:"temps-data" }}
+{{ humidity|json_script:"humidity-data" }}
+{{ co2|json_script:"co2-data" }}
+{{ rainfall|json_script:"rainfall-data" }}
+{{ regions|json_script:"regions-data" }}
+{{ rainfall_avg|json_script:"rainfallavg-data" }}
+
+{{ heatmap_values|json_script:"heatmap-values" }}
+{{ heatmap_x|json_script:"heatmap-x" }}
+{{ heatmap_y|json_script:"heatmap-y" }}
+
+{{ corr_values|json_script:"corr-values" }}
+{{ corr_labels|json_script:"corr-labels" }}
+
+{{ box_temp|json_script:"box-temp" }}
+{{ box_humidity|json_script:"box-humidity" }}
+{{ box_co2|json_script:"box-co2" }}
+{{ box_rainfall|json_script:"box-rainfall" }}
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const months = JSON.parse(document.getElementById('months-data').textContent);
+const temps = JSON.parse(document.getElementById('temps-data').textContent);
+const humidity = JSON.parse(document.getElementById('humidity-data').textContent);
+const co2 = JSON.parse(document.getElementById('co2-data').textContent);
+const rainfall = JSON.parse(document.getElementById('rainfall-data').textContent);
+const regions = JSON.parse(document.getElementById('regions-data').textContent);
+const rainfall_avg = JSON.parse(document.getElementById('rainfallavg-data').textContent);
+
+// 🌡 Line
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{ label: 'Temp', data: temps }]
+    }
+});
+
+// 📊 Bar
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{ label: 'Humidity', data: humidity }]
+    }
+});
+
+// 🥧 Pie
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: regions,
+        datasets: [{ data: rainfall_avg }]
+    }
+});
+
+// 🎯 Scatter
+new Chart(document.getElementById('scatterChart'), {
+    type: 'scatter',
+    data: {
+        datasets: [{
+            label: 'Temp vs CO2',
+            data: temps.map((t, i) => ({ x: co2[i], y: t }))
+        }]
+    }
+});
+
+const heatmapValues = JSON.parse(document.getElementById('heatmap-values').textContent);
+const heatmapX = JSON.parse(document.getElementById('heatmap-x').textContent);
+const heatmapY = JSON.parse(document.getElementById('heatmap-y').textContent);
+
+const corrValues = JSON.parse(document.getElementById('corr-values').textContent);
+const corrLabels = JSON.parse(document.getElementById('corr-labels').textContent);
+
+const boxTemp = JSON.parse(document.getElementById('box-temp').textContent);
+const boxHumidity = JSON.parse(document.getElementById('box-humidity').textContent);
+const boxCo2 = JSON.parse(document.getElementById('box-co2').textContent);
+const boxRainfall = JSON.parse(document.getElementById('box-rainfall').textContent);
+
+// 🔥 HEATMAP
+Plotly.newPlot('heatmapChart', [{
+    z: heatmapValues,
+    x: heatmapX,
+    y: heatmapY,
+    type: 'heatmap',
+    colorscale: 'YlOrRd'
+}]);
+
+// 🧠 CORRELATION MATRIX
+Plotly.newPlot('corrChart', [{
+    z: corrValues,
+    x: corrLabels,
+    y: corrLabels,
+    type: 'heatmap',
+    colorscale: 'Viridis'
+}]);
+
+// 📦 BOX PLOT
+Plotly.newPlot('boxChart', [
+    { y: boxTemp, type: 'box', name: 'Temp' },
+    { y: boxHumidity, type: 'box', name: 'Humidity' },
+    { y: boxCo2, type: 'box', name: 'CO2' },
+    { y: boxRainfall, type: 'box', name: 'Rainfall' }
+]);
+</script>
+
+{% endblock %}
