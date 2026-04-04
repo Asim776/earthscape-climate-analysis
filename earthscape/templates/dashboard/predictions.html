@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<h2 class="fw-bold mb-4">🤖 AI Climate Prediction</h2>
+<h2 class="fw-bold mb-4">🤖 Future Climate Prediction</h2>
 
 <div class="row">
 
@@ -13,48 +13,52 @@
     <div class="col-md-5">
         <div class="card p-4 shadow-sm border-0">
 
-            <h5 class="mb-3">Enter Climate Data</h5>
+            <h5 class="mb-3">Select Future Time</h5>
 
             <form method="POST">
                 {% csrf_token %}
 
+                <!-- YEAR -->
                 <div class="mb-3">
-                    <label>CO₂ (ppm)</label>
-                    <input type="number" step="0.1" name="co2" class="form-control" required>
+                    <label class="fw-semibold">Future Year</label>
+                    <select name="year" class="form-control" required>
+                        <option value="">Select Year</option>
+                        {% for y in years %}
+                            <option value="{{ y }}">{{ y }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
+                <!-- MONTH -->
                 <div class="mb-3">
-                    <label>Humidity (%)</label>
-                    <input type="number" step="0.1" name="humidity" class="form-control" required>
+                    <label class="fw-semibold">Month</label>
+                    <select name="month" class="form-control" required>
+                        <option value="">Select Month</option>
+
+                        {% for m in months_list %}
+                            <option value="{{ m }}">
+                                {% if m == 1 %}January
+                                {% elif m == 2 %}February
+                                {% elif m == 3 %}March
+                                {% elif m == 4 %}April
+                                {% elif m == 5 %}May
+                                {% elif m == 6 %}June
+                                {% elif m == 7 %}July
+                                {% elif m == 8 %}August
+                                {% elif m == 9 %}September
+                                {% elif m == 10 %}October
+                                {% elif m == 11 %}November
+                                {% elif m == 12 %}December
+                                {% endif %}
+                            </option>
+                        {% endfor %}
+
+                    </select>
                 </div>
 
-                <div class="mb-3">
-                    <label>Rainfall (mm)</label>
-                    <input type="number" step="0.1" name="rainfall" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label>Year</label>
-                    <input type="number" name="year" class="form-control" required>
-                </div>
-
-                <select name="month" class="form-control" required>
-    <option value="1">Jan</option>
-    <option value="2">Feb</option>
-    <option value="3">Mar</option>
-    <option value="4">Apr</option>
-    <option value="5">May</option>
-    <option value="6">June</option>
-    <option value="7">July</option>
-    <option value="8">Aug</option>
-    <option value="9">Sep</option>
-    <option value="10">Oct</option>
-    <option value="11">Nov</option>
-    <option value="12">Dec</option>
-</select>
-
+                <!-- BUTTON -->
                 <button class="btn btn-primary w-100">
-                    🔍 Predict Temperature
+                    🔮 Predict Temperature
                 </button>
 
             </form>
@@ -70,12 +74,18 @@
             {% if prediction %}
                 <h1 class="display-4 text-success">{{ prediction }}°C</h1>
 
-                <span class="badge bg-info">
-                    Model Confidence: {{ accuracy }}%
+                <span class="badge bg-info fs-6">
+                    Confidence: {{ accuracy }}%
                 </span>
 
+                <p class="text-muted mt-2">
+                    AI-based future climate forecast
+                </p>
+
             {% else %}
-                <p class="text-muted">Enter values to generate prediction</p>
+                <p class="text-muted">
+                    Select a future year and month to generate prediction
+                </p>
             {% endif %}
 
         </div>
@@ -85,10 +95,11 @@
 
 <!-- 📊 GRAPH -->
 <div class="card p-4 shadow-sm border-0 mt-4">
-    <h5 class="fw-semibold mb-3">📈 Temperature Trend + Prediction</h5>
+    <h5 class="fw-semibold mb-3">📈 Temperature Trend + Future Prediction</h5>
     <canvas id="predictionChart"></canvas>
 </div>
 
+<!-- SAFE DATA -->
 {{ months|json_script:"months-data" }}
 {{ temps|json_script:"temps-data" }}
 
@@ -107,12 +118,20 @@ new Chart(document.getElementById('predictionChart'), {
     data: {
         labels: months,
         datasets: [{
-            label: 'Temperature',
+            label: 'Temperature Trend',
             data: temps,
             borderWidth: 3,
             tension: 0.4,
             fill: true
         }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        }
     }
 });
 </script>

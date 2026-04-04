@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from data_processing.utils import load_dataset, detect_anomalies, train_models, make_prediction
 import numpy as np
+from datetime import datetime
 
 @login_required
 def dashboard_view(request):
@@ -179,8 +180,9 @@ def charts_view(request):
 
     return render(request, 'dashboard/charts.html', context)
 
-from data_processing.utils import load_dataset, train_models, make_prediction
-import random
+
+
+
 @login_required
 def predictions_view(request):
     df = load_dataset()
@@ -193,36 +195,59 @@ def predictions_view(request):
     best_model_name = max(models, key=lambda k: models[k][1])
     model, accuracy = models[best_model_name]
 
+    # 🔥 FUTURE YEARS (next 10 years)
+    current_year = datetime.now().year
+    future_years = list(range(current_year, current_year + 10))
+
+    # 🔥 MONTHS
+    months_list = list(range(1, 13))
+
     if request.method == 'POST':
         try:
-            co2 = float(request.POST.get('co2', 0))
-            humidity = float(request.POST.get('humidity', 0))
-            rainfall = float(request.POST.get('rainfall', 0))
+            # ✅ ONLY YEAR & MONTH FROM USER
+            year = int(request.POST.get('year'))
+            month = int(request.POST.get('month'))
 
-            year = int(request.POST.get('year') or 0)
-            month = int(request.POST.get('month') or 1)
+            # 🚫 BLOCK PAST YEARS
+            if year < current_year:
+                prediction = None
+            else:
+                # 🔥 AUTO-GENERATE FEATURES (REAL WORLD LOGIC)
 
-            prediction = make_prediction(model, co2, humidity, rainfall, year, month)
+                # Use dataset averages
+                co2 = df['co2'].mean()
+                humidity = df['humidity'].mean()
+                rainfall = df['rainfall'].mean()
+
+                # (Optional: slight future trend simulation)
+                co2 += (year - current_year) * 2   # CO2 increases yearly
+                humidity += (month % 3) * 0.5      # small variation
+                rainfall += (month % 4) * 1.2      # seasonal variation
+
+                prediction = make_prediction(model, co2, humidity, rainfall, year, month)
 
         except Exception as e:
-            
             print("Prediction Error:", e)
             prediction = None
 
-    # 📊 Trend (REAL monthly average)
+    # 📊 HISTORICAL TREND
     monthly_avg = df.groupby('Month')['temperature'].mean().reset_index()
 
     months = monthly_avg['Month'].astype(str).tolist()
     temps = monthly_avg['temperature'].round(2).tolist()
 
-    # Add prediction point
+    # ➕ Add prediction point
     if prediction:
-        months.append("Pred")
+        months.append("Future")
         temps.append(prediction)
 
     context = {
         'prediction': prediction,
-        'accuracy': round(accuracy * 100, 2),  # convert to %
+        'accuracy': round(accuracy * 100, 2),
+
+        'years': future_years,
+        'months_list': months_list,
+
         'months': months,
         'temps': temps
     }

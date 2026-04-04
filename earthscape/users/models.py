@@ -9,3 +9,11 @@ class CustomUser(AbstractUser):
     )
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='viewer')
+
+    # 🔥 AUTO SYNC ROLE WITH DJANGO PERMISSIONS
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = 'admin'
+        elif self.is_staff and self.role == 'viewer':
+            self.role = 'analyst'
+        super().save(*args, **kwargs)
