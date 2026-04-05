@@ -1,40 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}AI Predictions | EarthScape{% endblock %}
+{% block title %}AI Predictions | EarthScape Climate Intelligence{% endblock %}
 {% block climate_models_active %}active{% endblock %}
 
 {% block content %}
 
-<h2 class="fw-bold mb-4">🤖 Future Climate Prediction</h2>
+<!-- Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4" data-aos="fade-down">
+    <div>
+        <h1 class="display-6 fw-bold" style="color: var(--text-primary);">
+            <i class="bi bi-robot me-2" style="color: #2c9cd4;"></i>
+            AI Climate Predictions
+        </h1>
+        <p class="text-muted mt-2">
+            <i class="bi bi-brain"></i> Machine learning models · Future climate forecasting · High accuracy predictions
+        </p>
+    </div>
+    <div class="rounded-4 p-3 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+        <i class="bi bi-calendar3 me-2 text-info"></i>
+        <span id="liveDate" style="color: var(--text-primary);"></span>
+    </div>
+</div>
 
-<div class="row">
-
-    <!-- INPUT -->
-    <div class="col-md-5">
-        <div class="card p-4 shadow-sm border-0">
-
-            <h5 class="mb-3">Select Future Time</h5>
-
-            <form method="POST">
+<div class="row g-4">
+    <!-- INPUT SECTION -->
+    <div class="col-lg-5" data-aos="fade-right" data-aos-delay="100">
+        <div class="chart-container">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-sliders2 fs-4 me-2" style="color: #2c9cd4;"></i>
+                <h5 class="fw-semibold mb-0">Prediction Parameters</h5>
+            </div>
+            
+            <form method="POST" id="predictionForm">
                 {% csrf_token %}
-
+                
+                <!-- Model Selection -->
+               
+                
                 <!-- YEAR -->
                 <div class="mb-3">
-                    <label class="fw-semibold">Future Year</label>
-                    <select name="year" class="form-control" required>
-                        <option value="">Select Year</option>
-                        {% for y in years %}
-                            <option value="{{ y }}">{{ y }}</option>
-                        {% endfor %}
-                    </select>
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar-year me-1"></i> Future Year
+                    </label>
+                    <input 
+    type="number" 
+    name="year" 
+    class="form-control" 
+    id="yearInput"
+    placeholder="Enter future year (e.g. 2035)" 
+    required
+>
                 </div>
 
                 <!-- MONTH -->
                 <div class="mb-3">
-                    <label class="fw-semibold">Month</label>
-                    <select name="month" class="form-control" required>
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar-month me-1"></i> Month
+                    </label>
+                    <select name="month" class="form-select" id="monthSelect" required>
                         <option value="">Select Month</option>
-
                         {% for m in months_list %}
                             <option value="{{ m }}">
                                 {% if m == 1 %}January
@@ -52,88 +76,386 @@
                                 {% endif %}
                             </option>
                         {% endfor %}
-
                     </select>
                 </div>
+                
+               
 
-                <!-- BUTTON -->
-                <button class="btn btn-primary w-100">
-                    🔮 Predict Temperature
+                <button type="submit" class="btn btn-primary w-100" id="predictBtn">
+                    <i class="bi bi-magic"></i> Generate AI Prediction
                 </button>
-
             </form>
+            
+            <!-- Model Info -->
+            <div class="alert alert-info mt-3" style="background: rgba(44, 156, 212, 0.1); border: 1px solid rgba(44, 156, 212, 0.3);">
+                <i class="bi bi-lightbulb-fill me-2"></i>
+                <strong>Model Info:</strong> Trained on historical climate dataset (2000 –2024)
+            </div>
         </div>
     </div>
 
-    <!-- RESULT -->
-    <div class="col-md-7">
-        <div class="card p-4 shadow-sm border-0 text-center">
+    <!-- RESULT SECTION -->
+    <div class="col-lg-7" data-aos="fade-left" data-aos-delay="200">
+        <div class="chart-container">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-graph-up fs-4 me-2" style="color: #2c9cd4;"></i>
+                <h5 class="fw-semibold mb-0">Prediction Result</h5>
+            </div>
 
-            <h5 class="mb-3">Prediction Result</h5>
-
+            <br><br> 
+            
             {% if prediction %}
-                <h1 class="display-4 text-success">{{ prediction }}°C</h1>
-
-                <span class="badge bg-info fs-6">
-                    Confidence: {{ accuracy }}%
-                </span>
-
-                <p class="text-muted mt-2">
-                    AI-based future climate forecast
-                </p>
-
+                <div class="text-center">
+                    <!-- Animated counter for prediction -->
+                    <div class="display-1 fw-bold" style="color: #2c9cd4;" id="predictionValue">
+                        {{ prediction }}<span style="font-size: 2rem;">°C</span>
+                    </div>
+                    
+                    
+                    <!-- Trend Indicator -->
+                    <div class="mt-3">
+                        {% if prediction > 25 %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <strong>Warning:</strong> Above-average temperature predicted for this period
+                            </div>
+                        {% elif prediction < 10 %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-snow me-2"></i>
+                                <strong>Note:</strong> Below-average temperatures expected
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <strong>Normal:</strong> Temperatures within historical range
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             {% else %}
-                <p class="text-muted">
-                    Select a future year and month to generate prediction
-                </p>
+                <div class="text-center py-5">
+                    <i class="bi bi-robot display-1 text-muted"></i>
+                    <p class="text-muted mt-3">
+                        Select a future year and month to generate AI prediction
+                    </p>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> Our AI models analyze historical patterns to predict future climate conditions
+                        </small>
+                    </div>
+                </div>
             {% endif %}
-
         </div>
     </div>
-
 </div>
 
-<!-- 📊 GRAPH -->
-<div class="card p-4 shadow-sm border-0 mt-4">
-    <h5 class="fw-semibold mb-3">📈 Temperature Trend + Future Prediction</h5>
-    <canvas id="predictionChart"></canvas>
+<!-- 📊 HISTORICAL + PREDICTION CHART -->
+<div class="row g-4 mt-2" data-aos="fade-up" data-aos-delay="300">
+    <div class="col-12">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-bar-chart-line-fill me-2 text-primary"></i>
+                    Historical Data & Future Predictions
+                </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" id="toggleActualBtn">
+                        <i class="bi bi-eye"></i> Show Actual
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" id="togglePredictionBtn">
+                        <i class="bi bi-eye"></i> Show Prediction
+                    </button>
+                </div>
+            </div>
+            <canvas id="predictionChart" style="max-height: 400px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> 
+                Blue line shows historical temperature data | 
+                <span style="color: #28a745;">Green dashed line</span> shows AI-predicted future trend |
+                <span style="color: #ffc107;">Yellow area</span> represents confidence interval
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- SAFE DATA -->
 {{ months|json_script:"months-data" }}
 {{ temps|json_script:"temps-data" }}
+{% if prediction_data %}
+    {{ prediction_data|json_script:"prediction-data" }}
+{% endif %}
 
 {% endblock %}
 
 {% block extra_js %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 <script>
-const months = JSON.parse(document.getElementById('months-data').textContent);
-const temps = JSON.parse(document.getElementById('temps-data').textContent);
+// Set live date
+document.getElementById('liveDate').innerText = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+});
 
-new Chart(document.getElementById('predictionChart'), {
+// Parse data from backend
+function safeParse(id) {
+    const el = document.getElementById(id);
+    return el ? JSON.parse(el.textContent) : [];
+}
+
+const months = safeParse('months-data');
+const temps = safeParse('temps-data');
+
+// Get prediction data if available
+let predictionMonths = [...months];
+let predictionTemps = [...temps];
+let hasPrediction = false;
+
+try {
+    const predictionDataRaw = document.getElementById('prediction-data');
+    if (predictionDataRaw) {
+        const predictionData = JSON.parse(predictionDataRaw.textContent);
+        if (predictionData && predictionData.length > 0) {
+            predictionMonths = [...months, ...predictionData.map(p => p.month)];
+            predictionTemps = [...temps, ...predictionData.map(p => p.value)];
+            hasPrediction = true;
+        }
+    }
+} catch(e) {
+    console.log('No prediction data available');
+}
+
+// Prepare chart data with actual and predicted values
+const actualData = [...temps];
+let predictedData = [];
+
+if (hasPrediction) {
+    predictedData = [
+        ...new Array(temps.length).fill(null),
+        ...predictionTemps.slice(temps.length)
+    ];
+} else {
+    predictedData = new Array(predictionMonths.length).fill(null);
+}
+
+// Create chart
+const ctx = document.getElementById('predictionChart').getContext('2d');
+let predictionChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: months,
-        datasets: [{
-            label: 'Temperature Trend',
-            data: temps,
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true
-        }]
+        labels: predictionMonths,
+        datasets: [
+            {
+                label: 'Historical Temperature (°C)',
+                data: actualData,
+                borderColor: '#2c9cd4',
+                backgroundColor: 'rgba(44, 156, 212, 0.05)',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+                pointBackgroundColor: '#2c9cd4',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6
+            },
+            {
+                label: 'AI Prediction (°C)',
+                data: predictedData,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                borderWidth: 3,
+                borderDash: [10, 5],
+                tension: 0.3,
+                fill: false,
+                pointRadius: 6,
+                pointBackgroundColor: '#28a745',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 8,
+                showLine: hasPrediction
+            }
+        ]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: true,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
         plugins: {
             legend: {
-                position: 'top'
+                position: 'top',
+                labels: {
+                    usePointStyle: true,
+                    boxWidth: 10,
+                    font: { size: 12, weight: 'bold' },
+                    color: getComputedStyle(document.body).getPropertyValue('--text-primary')
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#2c9cd4',
+                borderWidth: 2,
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += context.parsed.y.toFixed(1) + '°C';
+                            if (context.dataset.label === 'AI Prediction (°C)') {
+                                label += ' 🔮';
+                            }
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: 'Temperature (°C)',
+                    color: 'var(--text-secondary)',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'var(--border-color)'
+                },
+                ticks: {
+                    color: 'var(--text-secondary)',
+                    callback: function(value) {
+                        return value + '°C';
+                    }
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Timeline',
+                    color: 'var(--text-secondary)',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'var(--border-color)'
+                },
+                ticks: {
+                    color: 'var(--text-secondary)',
+                    maxRotation: 45,
+                    minRotation: 45,
+                    autoSkip: true,
+                    maxTicksLimit: 15
+                }
             }
         }
     }
 });
+
+// Animate prediction value if present
+if (document.getElementById('predictionValue')) {
+    const predictionElement = document.getElementById('predictionValue');
+    const targetValue = parseFloat(predictionElement.innerText);
+
+    if (!isNaN(targetValue)) {
+        let currentValue = 0;
+
+        const animateValue = setInterval(() => {
+            if (currentValue >= targetValue) {
+                clearInterval(animateValue);
+                predictionElement.innerHTML = targetValue.toFixed(1) + '°C';
+            } else {
+                currentValue += targetValue / 50;
+                predictionElement.innerHTML = currentValue.toFixed(1) + '°C';
+            }
+        }, 20);
+    }
+}
+
+// Toggle dataset visibility
+let showActual = true;
+let showPrediction = true;
+
+document.getElementById('toggleActualBtn')?.addEventListener('click', () => {
+    showActual = !showActual;
+    predictionChart.data.datasets[0].hidden = !showActual;
+    predictionChart.update();
+    document.getElementById('toggleActualBtn').innerHTML = showActual ? 
+        '<i class="bi bi-eye"></i> Hide Actual' : '<i class="bi bi-eye-slash"></i> Show Actual';
+});
+
+document.getElementById('togglePredictionBtn')?.addEventListener('click', () => {
+    showPrediction = !showPrediction;
+    predictionChart.data.datasets[1].hidden = !showPrediction;
+    predictionChart.update();
+    document.getElementById('togglePredictionBtn').innerHTML = showPrediction ? 
+        '<i class="bi bi-eye"></i> Hide Prediction' : '<i class="bi bi-eye-slash"></i> Show Prediction';
+});
+
+// Form submission loading state
+document.getElementById('predictionForm')?.addEventListener('submit', function() {
+    const btn = document.getElementById('predictBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating Prediction...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.innerHTML = '<i class="bi bi-magic"></i> Generate AI Prediction';
+        btn.disabled = false;
+    }, 3000);
+});
+
+// Animation for containers
+const containers = document.querySelectorAll('.chart-container, .stat-card');
+containers.forEach((container, index) => {
+    container.style.opacity = '0';
+    container.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.05}s`;
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .chart-container, .stat-card {
+        animation-fill-mode: forwards;
+    }
+    
+    .form-select, .form-control {
+        transition: all 0.3s ease;
+    }
+    
+    .form-select:hover, .form-control:hover {
+        border-color: #2c9cd4;
+    }
+    
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(30, 111, 159, 0.3);
+    }
+`;
+document.head.appendChild(style);
 </script>
 
 {% endblock %}

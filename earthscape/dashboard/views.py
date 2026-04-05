@@ -1,8 +1,10 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from data_processing.utils import load_dataset, detect_anomalies, train_models, make_prediction
 import numpy as np
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from data_processing.utils import load_dataset, detect_anomalies, train_models, make_prediction
 from datetime import datetime
+from django.contrib.auth.models import User
+from django.contrib import messages
 
 @login_required
 def dashboard_view(request):
@@ -29,39 +31,42 @@ def dashboard_view(request):
     regions = sorted(df_all['Region'].unique())
 
     # ✅ CHART DATA
-    dates = (df['Year'].astype(str) + "-" + df['Month'].astype(str)).tolist()[:12]
-    temps = df['temperature'].tolist()[:12]
+    dates = (df['Year'].astype(str) + "-" + df['Month'].astype(str)).tolist()
+    temps = df['temperature'].tolist()
+
+    # 🔥 PROFESSIONAL: anomaly points from backend
+    anomaly_points = [
+        temp if anomaly == 1 else None
+        for temp, anomaly in zip(df['temperature'], df['anomaly'])
+    ]
 
     # ✅ FILTERED STATS
     total_records = len(df)
-    anomalies_count = df['anomaly'].sum()
+    anomalies_count = int(df['anomaly'].sum())
 
-    # ✅ FULL DATA STATS (NEW 🔥)
+    # ✅ FULL DATA STATS
     total_records_all = len(df_all)
-    total_anomalies_all = df_all['anomaly'].sum()
+    total_anomalies_all = int(df_all['anomaly'].sum())
 
     # ✅ ANOMALY TABLE
     anomaly_data = df[df['anomaly'] == 1][
         ['Year', 'Month', 'Region', 'temperature', 'humidity', 'co2', 'rainfall']
     ].head(10).to_dict(orient='records')
 
-    # ✅ CONTEXT
     context = {
         'dates': dates,
         'temps': temps,
+        'anomaly_points': anomaly_points,  # 🔥 IMPORTANT
 
-        # FILTERED
         'total_records': total_records,
         'anomalies_count': anomalies_count,
 
-        # FULL DATA (🔥 NEW)
         'total_records_all': total_records_all,
         'total_anomalies_all': total_anomalies_all,
 
-        'avg_temp': round(df['temperature'].mean(), 2),
+        'avg_temp': round(df['temperature'].mean(), 2) if len(df) > 0 else 0,
         'anomaly_data': anomaly_data,
 
-        # FILTERS
         'years': years,
         'regions': regions,
         'selected_year': selected_year,
@@ -72,6 +77,8 @@ def dashboard_view(request):
 
 @login_required
 def analysis_view(request):
+    import numpy as np
+
     df = load_dataset()
 
     # Filters
@@ -89,12 +96,43 @@ def analysis_view(request):
     years = sorted(df_all['Year'].unique())
     regions = sorted(df_all['Region'].unique())
 
-    # Stats
-    avg_temp = round(df['temperature'].mean(), 2)
-    max_temp = df['temperature'].max()
-    min_temp = df['temperature'].min()
+    # Handle empty dataset safely
+    if df.empty:
+        context = {
+            'avg_temp': 0,
+            'max_temp': 0,
+            'min_temp': 0,
+            'avg_co2': 0,
+            'months': [],
+            'temps': [],
+            'humidity': [],
+            'co2': [],
+            'rainfall': [],
+            'years': years,
+            'regions': regions,
+            'selected_year': selected_year,
+            'selected_region': selected_region,
+            'temp_trend': 0,
+            'co2_trend': 0,
+            'correlation_temp_co2': 0,
+            'correlation_temp_humidity': 0,
+            'correlation_temp_rainfall': 0,
+            'insight': "No data available",
+            'alert': "No alerts"
+        }
+        return render(request, 'dashboard/analysis.html', context)
 
-    # Monthly aggregation
+    # =========================
+    # 📊 BASIC STATS
+    # =========================
+    avg_temp = round(df['temperature'].mean(), 2)
+    max_temp = round(df['temperature'].max(), 2)
+    min_temp = round(df['temperature'].min(), 2)
+    avg_co2 = round(df['co2'].mean(), 2)
+
+    # =========================
+    # 📅 MONTHLY AGGREGATION
+    # =========================
     monthly = df.groupby('Month').agg({
         'temperature': 'mean',
         'humidity': 'mean',
@@ -108,19 +146,77 @@ def analysis_view(request):
     co2 = monthly['co2'].round(2).tolist()
     rainfall = monthly['rainfall'].round(2).tolist()
 
+    # =========================
+    # 📈 TRENDS (FIRST vs LAST)
+    # =========================
+    def calculate_trend(data):
+        if len(data) < 2:
+            return 0
+        return round(data[-1] - data[0], 2)
+
+    temp_trend = calculate_trend(temps)
+    co2_trend = calculate_trend(co2)
+
+    # =========================
+    # 🔗 CORRELATIONS
+    # =========================
+    def safe_corr(a, b):
+        if len(a) < 2:
+            return 0
+        return round(np.corrcoef(a, b)[0, 1] * 100, 2)
+
+    correlation_temp_co2 = safe_corr(temps, co2)
+    correlation_temp_humidity = safe_corr(temps, humidity)
+    correlation_temp_rainfall = safe_corr(temps, rainfall)
+
+    # =========================
+    # 💡 INSIGHTS (AI-LIKE)
+    # =========================
+    if correlation_temp_co2 > 70:
+        insight = "Strong positive correlation between temperature and CO₂ → possible greenhouse effect impact."
+    elif correlation_temp_co2 > 40:
+        insight = "Moderate correlation between temperature and CO₂ levels."
+    else:
+        insight = "Weak relationship between temperature and CO₂."
+
+    # =========================
+    # ⚠️ ALERTS
+    # =========================
+    if avg_co2 > 420:
+        alert = "High CO₂ levels detected. Environmental risk increasing."
+    elif avg_temp > 30:
+        alert = "High temperature trend detected. Possible heatwave conditions."
+    else:
+        alert = "Climate conditions are within normal range."
+
+    # =========================
+    # FINAL CONTEXT
+    # =========================
     context = {
         'avg_temp': avg_temp,
         'max_temp': max_temp,
         'min_temp': min_temp,
+        'avg_co2': avg_co2,
+
         'months': months,
         'temps': temps,
         'humidity': humidity,
         'co2': co2,
         'rainfall': rainfall,
+
         'years': years,
         'regions': regions,
         'selected_year': selected_year,
-        'selected_region': selected_region
+        'selected_region': selected_region,
+
+        # NEW DYNAMIC DATA
+        'temp_trend': temp_trend,
+        'co2_trend': co2_trend,
+        'correlation_temp_co2': correlation_temp_co2,
+        'correlation_temp_humidity': correlation_temp_humidity,
+        'correlation_temp_rainfall': correlation_temp_rainfall,
+        'insight': insight,
+        'alert': alert
     }
 
     return render(request, 'dashboard/analysis.html', context)
@@ -253,3 +349,34 @@ def predictions_view(request):
     }
 
     return render(request, 'dashboard/predictions.html', context)
+
+# 🔐 Only admin can access
+def is_admin(user):
+    return user.is_superuser or getattr(user, 'role', '') == 'Admin'
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    users = User.objects.all().order_by('-date_joined')
+
+    context = {
+        'users': users,
+        'total_users': users.count(),
+    }
+
+    return render(request, 'dashboard/admin_dashboard.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    # Prevent deleting yourself
+    if user == request.user:
+        messages.error(request, "You cannot delete yourself!")
+        return redirect('admin_dashboard')
+
+    user.delete()
+    messages.success(request, "User deleted successfully!")
+    return redirect('admin_dashboard')

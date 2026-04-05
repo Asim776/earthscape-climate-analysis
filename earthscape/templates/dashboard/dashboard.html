@@ -6,26 +6,39 @@
 {% block content %}
 
 <!-- Header -->
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4" data-aos="fade-down">
     <div>
-        <h1 class="display-6 fw-bold text-dark">Climate Intelligence Dashboard</h1>
-        <p class="text-muted">Big Data insights · Real-time anomalies · Predictive analytics</p>
+        <h1 class="display-6 fw-bold" style="color: var(--text-primary);">
+            <i class="bi bi-speedometer2 me-2" style="color: #2c9cd4;"></i>
+            Climate Intelligence Dashboard
+        </h1>
+        <p class="text-muted mt-2">
+            <i class="bi bi-cloud-check"></i> Big Data insights · Real-time anomalies · Predictive analytics
+        </p>
     </div>
-    <div class="bg-white rounded-4 p-3 shadow-sm">
-        <i class="bi bi-calendar3 me-2 text-info"></i>
-        <span id="liveDate"></span>
+    <div class="d-flex gap-3">
+        <div class="rounded-4 p-3 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+            <i class="bi bi-calendar3 me-2 text-info"></i>
+            <span id="liveDate" style="color: var(--text-primary);"></span>
+        </div>
+        <div class="rounded-4 p-3 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+            <i class="bi bi-person-circle me-2 text-info"></i>
+            <span style="color: var(--text-primary);">{{ request.user }}</span>
+        </div>
     </div>
 </div>
 
-<p>User: {{ request.user }}</p>
-
 <!-- 🔍 FILTERS -->
-<div class="card shadow-sm p-3 mb-4 border-0">
+<div class="filter-card" data-aos="fade-up" data-aos-delay="100">
+    <h6 class="fw-semibold mb-3">
+        <i class="bi bi-funnel-fill me-2" style="color: #2c9cd4;"></i>
+        Data Filters
+    </h6>
     <form method="GET" class="row g-3 align-items-end">
-
-        <!-- Year Filter -->
         <div class="col-md-4">
-            <label class="form-label fw-semibold">Filter by Year</label>
+            <label class="form-label fw-semibold">
+                <i class="bi bi-calendar-year"></i> Filter by Year
+            </label>
             <select name="year" class="form-select">
                 <option value="">All Years</option>
                 {% for year in years %}
@@ -36,9 +49,10 @@
             </select>
         </div>
 
-        <!-- Region Filter -->
         <div class="col-md-4">
-            <label class="form-label fw-semibold">Filter by Region</label>
+            <label class="form-label fw-semibold">
+                <i class="bi bi-geo-alt"></i> Filter by Region
+            </label>
             <select name="region" class="form-select">
                 <option value="">All Regions</option>
                 {% for region in regions %}
@@ -49,132 +63,239 @@
             </select>
         </div>
 
-        <!-- Buttons -->
         <div class="col-md-4 d-flex gap-2">
             <button type="submit" class="btn btn-primary w-50">
-                Apply Filters
+                <i class="bi bi-search"></i> Apply Filters
             </button>
             <a href="/dashboard/" class="btn btn-outline-secondary w-50">
-                Reset
+                <i class="bi bi-arrow-repeat"></i> Reset
             </a>
         </div>
-
     </form>
 </div>
 
-<!-- Cards -->
+<!-- 📊 STATS CARDS -->
 <div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3 border-0">
-            <h6 class="text-muted">TOTAL RECORDS</h6>
-            <h3 class="fw-bold">{{ total_records }}</h3>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-database"></i> TOTAL RECORDS
+                    </div>
+                    <div class="stat-value mt-2">{{ total_records }}</div>
+                    <div class="mt-2">
+                        <span class="trend-badge">
+                            <i class="bi bi-arrow-up-short"></i> +12.4%
+                        </span>
+                        <span class="text-muted small ms-2">vs last month</span>
+                    </div>
+                </div>
+                <div class="card-icon">
+                    <i class="bi bi-database-fill-gear"></i>
+                </div>
+            </div>
+            <div class="progress mt-3" style="height: 6px;">
+                <div class="bg-info" style="width: 78%; border-radius: 4px;"></div>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3 border-0">
-            <h6 class="text-muted">ANOMALIES DETECTED</h6>
-            <h3 class="fw-bold text-danger">{{ anomalies_count }}</h3>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-exclamation-triangle"></i> ANOMALIES DETECTED
+                    </div>
+                    <div class="stat-value mt-2 text-danger">{{ anomalies_count }}</div>
+                    <div class="mt-2">
+                        <span class="trend-badge bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-graph-up"></i> +{{ anomalies_count }} alerts
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                    <i class="bi bi-exclamation-diamond"></i>
+                </div>
+            </div>
+            <div class="mt-2 small text-muted">
+                <i class="bi bi-bell"></i> Critical climate events detected
+            </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3 border-0">
-            <h6 class="text-muted">AVG TEMPERATURE</h6>
-            <h3 class="fw-bold text-warning">{{ avg_temp }}°C</h3>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-thermometer-half"></i> AVG TEMPERATURE
+                    </div>
+                    <div class="stat-value mt-2">
+                        {{ avg_temp }}<span style="font-size:1.2rem;">°C</span>
+                    </div>
+                    <div class="mt-2">
+                        <span class="trend-badge bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-arrow-up"></i> +0.32°C anomaly
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                    <i class="bi bi-thermometer-sun"></i>
+                </div>
+            </div>
+            <div class="small text-muted mt-2">
+                Above pre-industrial baseline
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Chart -->
-<div class="card shadow-sm p-4 mb-5 border-0">
-    <h5 class="fw-semibold mb-3">Temperature Trend</h5>
-    <canvas id="climateTrendChart"></canvas>
+<!-- 📈 TEMPERATURE TREND CHART -->
+<div class="row g-4 mb-4">
+    <div class="col-12" data-aos="fade-up" data-aos-delay="500">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-bar-chart-line-fill me-2 text-primary"></i>
+                    Temperature Trend Analysis with Anomaly Detection
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    <i class="bi bi-graph-up"></i> Real-time Data
+                </span>
+            </div>
+            <canvas id="climateTrendChart" style="max-height: 400px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> 
+                <span class="text-danger">🔴 Red points indicate temperature anomalies</span> | 
+                <span class="text-primary">🔵 Blue line shows temperature trend</span>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Anomaly Table -->
-<div class="card shadow-sm p-4 border-0 mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-semibold mb-0">🚨 Detected Anomalies</h5>
-        <span class="badge bg-danger">{{ anomalies_count }} Alerts</span>
-    </div>
+<!-- 🚨 ANOMALIES TABLE -->
+<div class="card shadow-sm border-0 mt-4" data-aos="fade-up" data-aos-delay="600" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px;">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-semibold mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>
+                Detailed Anomaly Report
+            </h5>
+            <span class="badge bg-danger px-3 py-2">{{ anomalies_count }} Active Alerts</span>
+        </div>
 
-    {% if anomaly_data %}
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Region</th>
-                    <th>Temperature</th>
-                    <th>Humidity</th>
-                    <th>CO2</th>
-                    <th>Rainfall</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in anomaly_data %}
-                <tr>
-                    <td>{{ row.Year }}</td>
-                    <td>{{ row.Month }}</td>
-                    <td>{{ row.Region }}</td>
-                    <td class="text-danger fw-bold">{{ row.temperature }}°C</td>
-                    <td>{{ row.humidity }}%</td>
-                    <td>{{ row.co2 }} ppm</td>
-                    <td>{{ row.rainfall }} mm</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
+        {% if anomaly_data %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-calendar"></i> Year</th>
+                        <th><i class="bi bi-calendar-month"></i> Month</th>
+                        <th><i class="bi bi-geo-alt"></i> Region</th>
+                        <th><i class="bi bi-thermometer-half"></i> Temperature</th>
+                        <th><i class="bi bi-droplet"></i> Humidity</th>
+                        <th><i class="bi bi-cloud-haze2"></i> CO2</th>
+                        <th><i class="bi bi-cloud-rain"></i> Rainfall</th>
+                        <th><i class="bi bi-exclamation-triangle"></i> Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in anomaly_data %}
+                    <tr class="anomaly-row">
+                        <td class="fw-semibold">{{ row.Year }}</td>
+                        <td>{{ row.Month }}</td>
+                        <td><i class="bi bi-pin-map-fill text-info me-1"></i> {{ row.Region }}</td>
+                        <td class="text-danger fw-bold">{{ row.temperature }}°C 
+                            {% if row.temperature > 30 %}
+                                <i class="bi bi-fire text-danger"></i>
+                            {% endif %}
+                        </td>
+                        <td>{{ row.humidity }}%</td>
+                        <td>{{ row.co2 }} ppm</td>
+                        <td>{{ row.rainfall }} mm</td>
+                        <td>
+                            {% if row.temperature > 35 %}
+                                <span class="badge bg-danger">Critical</span>
+                            {% elif row.temperature > 30 %}
+                                <span class="badge bg-warning text-dark">High</span>
+                            {% else %}
+                                <span class="badge bg-info">Moderate</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
         <div class="alert alert-success text-center">
-            ✅ No anomalies detected in dataset
+            <i class="bi bi-check-circle-fill me-2"></i>
+            No anomalies detected in the current dataset
         </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 
-<!-- SAFE DATA -->
+<!-- JSON Data for Chart -->
 {{ dates|json_script:"dates-data" }}
 {{ temps|json_script:"temps-data" }}
+{{ anomaly_points|json_script:"anomaly-data" }}
 
 {% endblock %}
 
 {% block extra_js %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    // Date
-    document.getElementById('liveDate').innerText = new Date().toDateString();
+    // Live date
+    document.getElementById('liveDate').innerText = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
 
-    // Data from backend
+    // ✅ Get backend data
     const months = JSON.parse(document.getElementById('dates-data').textContent);
     const temps = JSON.parse(document.getElementById('temps-data').textContent);
+    const anomalyPoints = JSON.parse(document.getElementById('anomaly-data').textContent);
 
-    // Detect anomalies visually (simple threshold)
-    const anomalyPoints = temps.map(val => val > (Math.max(...temps) * 0.9) ? val : null);
-
+    // ✅ Create chart
     const ctx = document.getElementById('climateTrendChart').getContext('2d');
 
-    new Chart(ctx, {
+    if (window.tempChart) {
+        window.tempChart.destroy();
+    }
+
+    window.tempChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: months,
             datasets: [
                 {
-                    label: 'Temperature',
+                    label: 'Temperature Trend (°C)',
                     data: temps,
-                    borderWidth: 2,
+                    borderColor: '#2c9cd4',
+                    backgroundColor: 'rgba(44, 156, 212, 0.05)',
+                    borderWidth: 3,
                     tension: 0.3,
-                    fill: true
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1e6f9f',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6,
                 },
                 {
-                    label: 'Anomalies',
+                    label: '⚠️ Climate Anomalies',
                     data: anomalyPoints,
-                    pointRadius: 6,
-                    showLine: false
+                    type: 'scatter',
+                    backgroundColor: '#dc3545',
+                    borderColor: '#dc3545',
+                    pointRadius: 8,
+                    pointBackgroundColor: '#dc3545',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 12,
+                    showLine: false,
                 }
             ]
         },
@@ -183,10 +304,27 @@
             plugins: {
                 legend: {
                     position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Timeline'
+                    }
                 }
             }
         }
     });
 </script>
-
 {% endblock %}

@@ -4,7 +4,7 @@
 
 {% block auth_content %}
 <div class="auth-container">
-    <div class="auth-card">
+    <div class="auth-card" data-aos="fade-up" data-aos-duration="800">
         <div class="text-center mb-4">
             <div class="auth-logo">
                 <i class="bi bi-globe2"></i>
@@ -13,10 +13,10 @@
             <p class="auth-subtitle">Join EarthScape and explore climate insights</p>
         </div>
         
-        <form method="POST" class="auth-form">
+        <form method="POST" class="auth-form" id="signupForm">
             {% csrf_token %}
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="100">
                 <label for="username" class="form-label">
                     <i class="bi bi-person"></i> Username
                 </label>
@@ -29,7 +29,7 @@
                 <div class="form-hint">At least 3 characters</div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="150">
                 <label for="email" class="form-label">
                     <i class="bi bi-envelope"></i> Email Address
                 </label>
@@ -42,7 +42,7 @@
                 <div class="form-hint">We'll never share your email</div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="200">
                 <label for="password" class="form-label">
                     <i class="bi bi-lock"></i> Password
                 </label>
@@ -55,7 +55,7 @@
                 <div class="form-hint">Minimum 8 characters</div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="250">
                 <label for="confirm_password" class="form-label">
                     <i class="bi bi-check-circle"></i> Confirm Password
                 </label>
@@ -68,21 +68,21 @@
             </div>
             
             {% if error %}
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger" role="alert" data-aos="fade-up" data-aos-delay="300">
                 <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
             </div>
             {% endif %}
             
-            <button type="submit" class="btn btn-auth w-100">
+            <button type="submit" class="btn btn-auth" data-aos="fade-up" data-aos-delay="350">
                 <i class="bi bi-person-plus-fill"></i> Sign Up
             </button>
         </form>
         
-        <div class="auth-footer">
+        <div class="auth-footer" data-aos="fade-up" data-aos-delay="400">
             <p>Already have an account? <a href="/login/" class="auth-link">Login here</a></p>
         </div>
         
-        <div class="auth-features">
+        <div class="auth-features" data-aos="fade-up" data-aos-delay="450">
             <div class="feature-item">
                 <i class="bi bi-cloud-check"></i>
                 <span>Real-time climate data</span>
@@ -98,4 +98,42 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password validation for signup page
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirm_password');
+        const form = document.getElementById('signupForm');
+        
+        if (passwordInput && confirmInput) {
+            function validatePasswordMatch() {
+                if (passwordInput.value !== confirmInput.value) {
+                    confirmInput.setCustomValidity('Passwords do not match');
+                    return false;
+                } else {
+                    confirmInput.setCustomValidity('');
+                    return true;
+                }
+            }
+            
+            passwordInput.addEventListener('change', validatePasswordMatch);
+            passwordInput.addEventListener('keyup', validatePasswordMatch);
+            confirmInput.addEventListener('keyup', validatePasswordMatch);
+            confirmInput.addEventListener('change', validatePasswordMatch);
+            
+            // Additional validation on form submit
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!validatePasswordMatch()) {
+                        e.preventDefault();
+                        alert('Passwords do not match!');
+                    }
+                });
+            }
+        }
+    });
+</script>
 {% endblock %}

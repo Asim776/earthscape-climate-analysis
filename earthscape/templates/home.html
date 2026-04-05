@@ -2,13 +2,676 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}EarthScape{% endblock %}</title>
-
-    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarthScape AI | Climate Intelligence Platform</title>
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Light Mode Variables */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #1a2f3e;
+            --text-secondary: #4a6a85;
+            --text-muted: #6c86a3;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --hero-gradient-start: #f0f9ff;
+            --hero-gradient-end: #e0f2fe;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --footer-bg: #1a2f3e;
+            --footer-text: #ffffff;
+            --stat-bg: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+        }
+        
+        body.dark {
+            /* Dark Mode Variables - Improved contrast */
+            --bg-primary: #0a1a2f;
+            --bg-secondary: #0f2838;
+            --text-primary: #f0f4f8;
+            --text-secondary: #cbd5e6;
+            --text-muted: #a0b8d0;
+            --card-bg: #122c3d;
+            --border-color: #2c4b6e;
+            --hero-gradient-start: #0c2b3e;
+            --hero-gradient-end: #0a1a2f;
+            --navbar-bg: rgba(10, 26, 47, 0.95);
+            --footer-bg: #061220;
+            --footer-text: #cbdbe6;
+            --stat-bg: #122c3d;
+            --input-bg: #1a2f3e;
+            --input-border: #2c4b6e;
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: var(--navbar-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e6f9f, #2c9cd4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-link {
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: #2c9cd4;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Animated Background Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(44, 156, 212, 0.1), rgba(30, 111, 159, 0.05));
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .globe-icon {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Feature Cards */
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: #2c9cd4;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .feature-card h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .feature-card a {
+            color: #2c9cd4;
+            font-weight: 500;
+        }
+        
+        .feature-card a:hover {
+            color: #1e6f9f;
+        }
+        
+        .stat-card {
+            background: var(--stat-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-card .display-5,
+        .stat-card .display-6 {
+            color: var(--text-primary);
+        }
+        
+        .stat-card small {
+            color: var(--text-muted);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #1e6f9f, #2c9cd4);
+            border-radius: 30px;
+            padding: 4rem;
+            text-align: center;
+        }
+        
+        .cta-section h2,
+        .cta-section p {
+            color: white !important;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+        
+        .footer h5, .footer h6 {
+            color: var(--footer-text);
+        }
+        
+        .footer p, .footer li a {
+            color: var(--text-muted) !important;
+        }
+        
+        .footer li a:hover {
+            color: #2c9cd4 !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e6f9f, #2c9cd4);
+            border: none;
+            padding: 12px 32px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 111, 159, 0.3);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #2c9cd4;
+            color: #2c9cd4;
+            padding: 12px 32px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #2c9cd4;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-light {
+            background: white;
+            color: #1e6f9f;
+            font-weight: 600;
+        }
+        
+        /* Form controls for dark mode */
+        .form-control {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+        }
+        
+        .form-control:focus {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: #2c9cd4;
+            box-shadow: 0 0 0 0.2rem rgba(44, 156, 212, 0.25);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* Text colors for better visibility */
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+        
+        .lead {
+            color: var(--text-secondary);
+        }
+        
+        /* Section backgrounds */
+        .bg-secondary.bg-opacity-10 {
+            background-color: var(--bg-secondary) !important;
+        }
+        
+        /* Stats section text */
+        .stat-card .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        /* Scroll animations */
+        [data-aos] {
+            pointer-events: auto;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                text-align: center;
+            }
+            
+            .cta-section {
+                padding: 2rem;
+            }
+            
+            .display-4 {
+                font-size: 2rem;
+            }
+            
+            .display-3 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="text-center py-5"> <!-- HERO --> <h1 class="display-4 fw-bold"> 🌍 EarthScape AI </h1> <p class="lead text-muted mt-3"> Smart Climate Analytics · Predict Future Trends · Detect Anomalies </p> <div class="mt-4"> <a href="/signup/" class="btn btn-primary btn-lg me-2"> 🚀 Get Started </a> <a href="/login/" class="btn btn-outline-dark btn-lg"> 🔑 Login </a> </div> </div> <!-- FEATURES --> <div class="row mt-5 text-center"> <div class="col-md-4"> <div class="card p-4 shadow-sm border-0"> <h5>📊 Dashboard</h5> <p class="text-muted">View climate insights and trends</p> </div> </div> <div class="col-md-4"> <div class="card p-4 shadow-sm border-0"> <h5>🤖 AI Predictions</h5> <p class="text-muted">Predict future climate conditions</p> </div> </div> <div class="col-md-4"> <div class="card p-4 shadow-sm border-0"> <h5>🚨 Anomaly Detection</h5> <p class="text-muted">Detect unusual climate patterns</p> </div> </div> </div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-globe2"></i> EarthScape AI
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link" href="#stats">Stats</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item">
+                    <div class="theme-toggle ms-2" id="themeToggle">
+                        <i class="bi bi-sun-fill" id="lightIcon"></i>
+                        <i class="bi bi-moon-fill" id="darkIcon" style="display: none;"></i>
+                        <span id="themeText">Light</span>
+                    </div>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/login/" class="btn btn-outline-primary btn-sm">Login</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/signup/" class="btn btn-primary btn-sm">Sign Up</a>
+                </li>
+                {% if user.is_superuser %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admin_dashboard' %}">
+        <i class="bi bi-shield-lock"></i> Admin
+    </a>
+</li>
+{% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <!-- Floating animated elements -->
+    <div class="floating-element" style="width: 300px; height: 300px; top: -100px; right: -100px; animation-duration: 8s;"></div>
+    <div class="floating-element" style="width: 200px; height: 200px; bottom: -50px; left: -50px; animation-duration: 10s;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 50%; left: 20%; animation-duration: 7s;"></div>
+    
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7" data-aos="fade-right" data-aos-duration="1000">
+                <div class="globe-icon mb-3">
+                    <i class="bi bi-globe-americas" style="font-size: 4rem; color: #2c9cd4;"></i>
+                </div>
+                <h1 class="display-3 fw-bold mb-3">
+                    Smart Climate Analytics for a <span style="color: #2c9cd4;">Sustainable Future</span>
+                </h1>
+                <p class="lead mb-4">
+                    Harness the power of AI and big data to predict climate trends, detect anomalies, 
+                    and make data-driven decisions for our planet's future.
+                </p>
+                <div class="d-flex gap-3 justify-content-lg-start justify-content-center">
+                    <a href="/signup/" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff"></i> Get Started Free
+                    </a>
+                    <a href="#features" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-play-circle"></i> Learn More
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check"></i> No credit card required · Free forever
+                    </small>
+                </div>
+            </div>
+            <div class="col-lg-5 mt-5 mt-lg-0" data-aos="fade-left" data-aos-duration="1000">
+                <div class="stat-card">
+                    <i class="bi bi-cloud-check" style="font-size: 3rem; color: #2c9cd4;"></i>
+                    <h3 class="mt-3">Real-time Climate Intelligence</h3>
+                    <p class="text-secondary">Powered by 2000-2024 Climate Dataset</p>
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <div class="display-6 fw-bold" style="color: #2c9cd4;">2.8M+</div>
+                            <small class="text-muted">Data Points</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="display-6 fw-bold" style="color: #2c9cd4;">99.9%</div>
+                            <small class="text-muted">Accuracy Rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold mb-3">Powerful Climate Analytics Tools</h2>
+            <p class="lead">Everything you need to monitor and predict climate patterns</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up" style="color: #2c9cd4;"></i>
+                    </div>
+                    <h4>Real-time Dashboard</h4>
+                    <p>Interactive dashboards with live climate data, temperature trends, and anomaly detection.</p>
+                    <a href="/dashboard/" class="text-decoration-none">Learn More →</a>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-robot" style="color: #2c9cd4;"></i>
+                    </div>
+                    <h4>AI Predictions</h4>
+                    <p>Machine learning models predict future climate conditions with high accuracy.</p>
+                    <a href="#" class="text-decoration-none">Learn More →</a>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-exclamation-triangle" style="color: #2c9cd4;"></i>
+                    </div>
+                    <h4>Anomaly Detection</h4>
+                    <p>Automatically detect unusual climate patterns and receive instant alerts.</p>
+                    <a href="#" class="text-decoration-none">Learn More →</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section id="stats" class="py-5 bg-secondary bg-opacity-10">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="100">
+                <div class="stat-card">
+                    <i class="bi bi-database" style="font-size: 2.5rem; color: #2c9cd4;"></i>
+                    <div class="display-5 fw-bold mt-2">50+</div>
+                    <div class="text-secondary">Data Sources</div>
+                    <small class="text-muted">Global networks</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="200">
+                <div class="stat-card">
+                    <i class="bi bi-people" style="font-size: 2.5rem; color: #2c9cd4;"></i>
+                    <div class="display-5 fw-bold mt-2">10K+</div>
+                    <div class="text-secondary">Active Users</div>
+                    <small class="text-muted">Worldwide</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="300">
+                <div class="stat-card">
+                    <i class="bi bi-check-circle" style="font-size: 2.5rem; color: #2c9cd4;"></i>
+                    <div class="display-5 fw-bold mt-2">98%</div>
+                    <div class="text-secondary">Accuracy</div>
+                    <small class="text-muted">AI predictions</small>
+                </div>
+            </div>
+            
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="400">
+                <div class="stat-card">
+                    <i class="bi bi-clock-history" style="font-size: 2.5rem; color: #2c9cd4;"></i>
+                    <div class="display-5 fw-bold mt-2">24/7</div>
+                    <div class="text-secondary">Monitoring</div>
+                    <small class="text-muted">Real-time updates</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section id="about" class="py-5">
+    <div class="container">
+        <div class="cta-section" data-aos="flip-up">
+            <h2 class="display-5 fw-bold mb-3">Ready to Transform Climate Intelligence?</h2>
+            <p class="lead mb-4" style="color: rgba(255,255,255,0.9) !important;">Join thousands of researchers and organizations using EarthScape AI</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/signup/" class="btn btn-light btn-lg">
+                    <i class="bi bi-person-plus"></i> Start Free Trial
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5><i class="bi bi-globe2"></i> EarthScape AI</h5>
+                <p class="text-muted">Empowering climate action through artificial intelligence and big data analytics.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-muted"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="text-muted"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="text-muted"><i class="bi bi-github"></i></a>
+                </div>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h6>Product</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-muted text-decoration-none">Features</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Pricing</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">API</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h6>Company</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-muted text-decoration-none">About</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Blog</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Careers</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h6>Stay Updated</h6>
+                <p class="text-muted">Subscribe to our newsletter for climate insights</p>
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your email">
+                    <button class="btn btn-primary" type="button">Subscribe</button>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-4">
+        <div class="text-center">
+            <small class="text-muted">&copy; 2025 EarthScape AI. All rights reserved. Powered by Big Data & AI.</small>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+    // Initialize AOS
+    AOS.init({
+        once: true,
+        offset: 100,
+        duration: 800
+    });
+    
+    // Light/Dark Mode Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const lightIcon = document.getElementById('lightIcon');
+    const darkIcon = document.getElementById('darkIcon');
+    const themeText = document.getElementById('themeText');
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'inline';
+        themeText.textContent = 'Dark';
+    } else if (savedTheme === 'light') {
+        document.body.classList.remove('dark');
+        lightIcon.style.display = 'inline';
+        darkIcon.style.display = 'none';
+        themeText.textContent = 'Light';
+    } else {
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark');
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'inline';
+            themeText.textContent = 'Dark';
+        }
+    }
+    
+    // Toggle theme
+    themeToggle.addEventListener('click', () => {
+        if (document.body.classList.contains('dark')) {
+            document.body.classList.remove('dark');
+            lightIcon.style.display = 'inline';
+            darkIcon.style.display = 'none';
+            themeText.textContent = 'Light';
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.body.classList.add('dark');
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'inline';
+            themeText.textContent = 'Dark';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Navbar background change on scroll
+    window.addEventListener('scroll', () => {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+        } else {
+            navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+        }
+    });
+</script>
 </body>
 </html>

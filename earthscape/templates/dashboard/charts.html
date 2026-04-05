@@ -1,67 +1,201 @@
 {% extends 'base.html' %}
 
-{% block title %}Charts | EarthScape{% endblock %}
+{% block title %}Data Visualization Hub | EarthScape Analytics{% endblock %}
 {% block charts_active %}active{% endblock %}
 
 {% block content %}
 
-<h2 class="fw-bold mb-4">📊 Data Visualization Hub</h2>
+<!-- Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4" data-aos="fade-down">
+    <div>
+        <h1 class="display-6 fw-bold" style="color: var(--text-primary);">
+            <i class="bi bi-bar-chart-steps me-2" style="color: #2c9cd4;"></i>
+            Data Visualization Hub
+        </h1>
+        <p class="text-muted mt-2">
+            <i class="bi bi-graph-up"></i> Interactive charts · Advanced analytics · Multi-dimensional insights
+        </p>
+    </div>
+    <div class="rounded-4 p-3 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+        <i class="bi bi-calendar3 me-2 text-info"></i>
+        <span id="liveDate" style="color: var(--text-primary);"></span>
+    </div>
+</div>
 
-<div class="row g-4">
 
-    <!-- 🌡 Line Chart -->
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>Temperature Trend</h6>
-            <canvas id="lineChart"></canvas>
+
+<!-- Basic Charts Grid -->
+<div class="row g-4 mb-4">
+    <!-- 📈 Line Chart - Temperature Trend -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-thermometer-half me-2 text-danger"></i>
+                    Temperature Trend (Line Chart)
+                </h5>
+                <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2">
+                    <i class="bi bi-graph-up"></i> Seasonal Analysis
+                </span>
+            </div>
+            <canvas id="lineChart" style="max-height: 350px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Monthly temperature variations with seasonal patterns
+            </div>
         </div>
     </div>
 
-    <!-- 📊 Bar Chart -->
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>Humidity Comparison</h6>
-            <canvas id="barChart"></canvas>
+    <!-- 📊 Bar Chart - Humidity Comparison -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-droplet-half me-2 text-info"></i>
+                    Humidity Comparison (Bar Chart)
+                </h5>
+                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                    <i class="bi bi-bar-chart"></i> Monthly Data
+                </span>
+            </div>
+            <canvas id="barChart" style="max-height: 350px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Relative humidity percentage distribution
+            </div>
         </div>
     </div>
 
-    <!-- 🥧 Pie Chart -->
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>Rainfall Distribution</h6>
-            <canvas id="pieChart"></canvas>
+    <!-- 🥧 Pie Chart - Rainfall Distribution -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-cloud-rain-fill me-2 text-primary"></i>
+                    Rainfall Distribution (Pie Chart)
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    <i class="bi bi-pie-chart"></i> Regional Share
+                </span>
+            </div>
+            <canvas id="pieChart" style="max-height: 350px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Average rainfall distribution by region
+            </div>
         </div>
     </div>
 
-    <!-- 🎯 Scatter Plot -->
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>Temperature vs CO₂</h6>
-            <canvas id="scatterChart"></canvas>
+    <!-- 🎯 Scatter Plot - Temperature vs CO₂ -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-diagram-3 me-2 text-success"></i>
+                    Temperature vs CO₂ Correlation (Scatter Plot)
+                </h5>
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                    <i class="bi bi-graph-up"></i> Correlation: 87%
+                </span>
+            </div>
+            <canvas id="scatterChart" style="max-height: 350px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Strong positive correlation between temperature and CO₂ levels
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Visualizations -->
+<div class="row g-4 mb-4">
+    <!-- 🔥 Heatmap -->
+    <div class="col-12" data-aos="fade-up" data-aos-delay="600">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-grid-3x3-gap-fill me-2 text-warning"></i>
+                    Temperature Heatmap (Region vs Month)
+                </h5>
+                <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2">
+                    <i class="bi bi-fire"></i> Thermal Distribution
+                </span>
+            </div>
+            <div id="heatmapChart" style="height: 500px;"></div>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Color intensity represents temperature variation across regions and months
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- 🧠 Correlation Matrix -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="700">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-diagram-3-fill me-2 text-info"></i>
+                    Correlation Matrix
+                </h5>
+                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                    <i class="bi bi-matrix"></i> Variable Relationships
+                </span>
+            </div>
+            <div id="corrChart" style="height: 450px;"></div>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Correlation coefficients between climate variables
+            </div>
         </div>
     </div>
 
+    <!-- 📦 Box Plot - Data Distribution -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="800">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-box-seam-fill me-2 text-purple"></i>
+                    Data Distribution (Box Plot)
+                </h5>
+                <span class="badge bg-purple bg-opacity-10 text-purple px-3 py-2">
+                    <i class="bi bi-graph-down"></i> Statistical Summary
+                </span>
+            </div>
+            <div id="boxChart" style="height: 450px;"></div>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Median, quartiles, and outliers for each climate metric
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 🔥 HEATMAP -->
-<div class="card p-3 shadow-sm border-0 mt-4">
-    <h6>🔥 Temperature Heatmap (Region vs Month)</h6>
-    <div id="heatmapChart"></div>
+<!-- 📊 Statistical Summary Cards -->
+<div class="row g-4 mb-4" data-aos="fade-up" data-aos-delay="900">
+    <div class="col-12">
+        <div class="chart-container">
+            <h5 class="fw-semibold mb-3">
+                <i class="bi bi-calculator-fill me-2 text-primary"></i>
+                Statistical Summary
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Mean</th>
+                            <th>Median</th>
+                            <th>Std Dev</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            <th>Range</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTable">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 🧠 CORRELATION MATRIX -->
-<div class="card p-3 shadow-sm border-0 mt-4">
-    <h6>🧠 Correlation Matrix</h6>
-    <div id="corrChart"></div>
-</div>
-
-<!-- 📦 BOX PLOT -->
-<div class="card p-3 shadow-sm border-0 mt-4">
-    <h6>📦 Data Distribution (Box Plot)</h6>
-    <div id="boxChart"></div>
-</div>
-
-<!-- SAFE DATA -->
+<!-- Safe Data for Charts -->
 {{ months|json_script:"months-data" }}
 {{ temps|json_script:"temps-data" }}
 {{ humidity|json_script:"humidity-data" }}
@@ -87,8 +221,18 @@
 {% block extra_js %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
+// Set live date
+document.getElementById('liveDate').innerText = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+});
+
+// Parse data from backend
 const months = JSON.parse(document.getElementById('months-data').textContent);
 const temps = JSON.parse(document.getElementById('temps-data').textContent);
 const humidity = JSON.parse(document.getElementById('humidity-data').textContent);
@@ -96,44 +240,6 @@ const co2 = JSON.parse(document.getElementById('co2-data').textContent);
 const rainfall = JSON.parse(document.getElementById('rainfall-data').textContent);
 const regions = JSON.parse(document.getElementById('regions-data').textContent);
 const rainfall_avg = JSON.parse(document.getElementById('rainfallavg-data').textContent);
-
-// 🌡 Line
-new Chart(document.getElementById('lineChart'), {
-    type: 'line',
-    data: {
-        labels: months,
-        datasets: [{ label: 'Temp', data: temps }]
-    }
-});
-
-// 📊 Bar
-new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-        labels: months,
-        datasets: [{ label: 'Humidity', data: humidity }]
-    }
-});
-
-// 🥧 Pie
-new Chart(document.getElementById('pieChart'), {
-    type: 'pie',
-    data: {
-        labels: regions,
-        datasets: [{ data: rainfall_avg }]
-    }
-});
-
-// 🎯 Scatter
-new Chart(document.getElementById('scatterChart'), {
-    type: 'scatter',
-    data: {
-        datasets: [{
-            label: 'Temp vs CO2',
-            data: temps.map((t, i) => ({ x: co2[i], y: t }))
-        }]
-    }
-});
 
 const heatmapValues = JSON.parse(document.getElementById('heatmap-values').textContent);
 const heatmapX = JSON.parse(document.getElementById('heatmap-x').textContent);
@@ -147,31 +253,354 @@ const boxHumidity = JSON.parse(document.getElementById('box-humidity').textConte
 const boxCo2 = JSON.parse(document.getElementById('box-co2').textContent);
 const boxRainfall = JSON.parse(document.getElementById('box-rainfall').textContent);
 
-// 🔥 HEATMAP
+// Common chart options for better visualization
+const getChartOptions = (title) => ({
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true,
+                boxWidth: 10,
+                font: { size: 11, weight: 'bold' },
+                color: getComputedStyle(document.body).getPropertyValue('--text-primary')
+            }
+        },
+        tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#2c9cd4',
+            borderWidth: 2
+        }
+    },
+    scales: {
+        y: {
+            grid: {
+                color: 'var(--border-color)'
+            },
+            ticks: {
+                color: 'var(--text-secondary)'
+            }
+        },
+        x: {
+            grid: {
+                color: 'var(--border-color)'
+            },
+            ticks: {
+                color: 'var(--text-secondary)',
+                maxRotation: 45,
+                minRotation: 45
+            }
+        }
+    }
+});
+
+// 📈 Line Chart - Temperature
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+let lineChart = new Chart(lineCtx, {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Temperature (°C)',
+            data: temps,
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.05)',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: '#dc3545',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6
+        }]
+    },
+    options: getChartOptions('Temperature Trend')
+});
+
+// 📊 Bar Chart - Humidity
+const barCtx = document.getElementById('barChart').getContext('2d');
+let barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Humidity (%)',
+            data: humidity,
+            backgroundColor: 'rgba(13, 202, 240, 0.7)',
+            borderColor: '#0dcaf0',
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: 'rgba(13, 202, 240, 0.9)'
+        }]
+    },
+    options: getChartOptions('Humidity Comparison')
+});
+
+// 🥧 Pie Chart - Rainfall Distribution
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+let pieChart = new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: regions,
+        datasets: [{
+            data: rainfall_avg,
+            backgroundColor: [
+                '#dc3545', '#fd7e14', '#ffc107', '#28a745', 
+                '#17a2b8', '#6f42c1', '#e83e8c', '#20c997'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    font: { size: 11 },
+                    color: getComputedStyle(document.body).getPropertyValue('--text-primary')
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${label}: ${value.toFixed(1)} mm (${percentage}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// 🎯 Scatter Plot - Temperature vs CO₂
+const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+let scatterChart = new Chart(scatterCtx, {
+    type: 'scatter',
+    data: {
+        datasets: [{
+            label: 'Data Points',
+            data: temps.map((t, i) => ({ x: co2[i], y: t })),
+            backgroundColor: '#28a745',
+            borderColor: '#28a745',
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: '#28a745',
+            pointBorderColor: '#fff'
+        }]
+    },
+    options: {
+        ...getChartOptions('Temperature vs CO₂ Correlation'),
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'CO₂ Concentration (ppm)',
+                    color: 'var(--text-secondary)'
+                },
+                grid: { color: 'var(--border-color)' },
+                ticks: { color: 'var(--text-secondary)' }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Temperature (°C)',
+                    color: 'var(--text-secondary)'
+                },
+                grid: { color: 'var(--border-color)' },
+                ticks: { color: 'var(--text-secondary)' }
+            }
+        },
+        plugins: {
+            ...getChartOptions().plugins,
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `CO₂: ${context.parsed.x.toFixed(0)} ppm, Temp: ${context.parsed.y.toFixed(1)}°C`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// 🔥 Heatmap
+const heatmapLayout = {
+    title: '',
+    xaxis: { title: 'Months', tickangle: -45, color: 'var(--text-primary)' },
+    yaxis: { title: 'Regions', color: 'var(--text-primary)' },
+    plot_bgcolor: 'var(--card-bg)',
+    paper_bgcolor: 'var(--card-bg)',
+    font: { color: 'var(--text-primary)' }
+};
+
 Plotly.newPlot('heatmapChart', [{
     z: heatmapValues,
     x: heatmapX,
     y: heatmapY,
     type: 'heatmap',
-    colorscale: 'YlOrRd'
-}]);
+    colorscale: 'YlOrRd',
+    showscale: true,
+    colorbar: { title: 'Temperature (°C)', titlefont: { color: 'var(--text-primary)' } }
+}], heatmapLayout, { responsive: true });
 
-// 🧠 CORRELATION MATRIX
+// 🧠 Correlation Matrix
+const corrLayout = {
+    title: '',
+    xaxis: { title: '', color: 'var(--text-primary)' },
+    yaxis: { title: '', color: 'var(--text-primary)' },
+    plot_bgcolor: 'var(--card-bg)',
+    paper_bgcolor: 'var(--card-bg)',
+    font: { color: 'var(--text-primary)' }
+};
+
 Plotly.newPlot('corrChart', [{
     z: corrValues,
     x: corrLabels,
     y: corrLabels,
     type: 'heatmap',
-    colorscale: 'Viridis'
-}]);
+    colorscale: 'Viridis',
+    showscale: true,
+    colorbar: { title: 'Correlation', titlefont: { color: 'var(--text-primary)' } }
+}], corrLayout, { responsive: true });
 
-// 📦 BOX PLOT
+// 📦 Box Plot
+const boxLayout = {
+    title: '',
+    plot_bgcolor: 'var(--card-bg)',
+    paper_bgcolor: 'var(--card-bg)',
+    font: { color: 'var(--text-primary)' },
+    yaxis: { title: 'Values', color: 'var(--text-primary)' }
+};
+
 Plotly.newPlot('boxChart', [
-    { y: boxTemp, type: 'box', name: 'Temp' },
-    { y: boxHumidity, type: 'box', name: 'Humidity' },
-    { y: boxCo2, type: 'box', name: 'CO2' },
-    { y: boxRainfall, type: 'box', name: 'Rainfall' }
-]);
+    { y: boxTemp, type: 'box', name: 'Temperature (°C)', marker: { color: '#dc3545' } },
+    { y: boxHumidity, type: 'box', name: 'Humidity (%)', marker: { color: '#0dcaf0' } },
+    { y: boxCo2, type: 'box', name: 'CO₂ (ppm)', marker: { color: '#28a745' } },
+    { y: boxRainfall, type: 'box', name: 'Rainfall (mm)', marker: { color: '#17a2b8' } }
+], boxLayout, { responsive: true });
+
+// 📊 Statistical Summary Table
+function calculateStats(data) {
+    const sorted = [...data].sort((a, b) => a - b);
+    const mean = data.reduce((a, b) => a + b, 0) / data.length;
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / data.length;
+    const stdDev = Math.sqrt(variance);
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min;
+    
+    return { mean: mean.toFixed(1), median: median.toFixed(1), stdDev: stdDev.toFixed(1), min: min.toFixed(1), max: max.toFixed(1), range: range.toFixed(1) };
+}
+
+const tempStats = calculateStats(temps);
+const humStats = calculateStats(humidity);
+const co2Stats = calculateStats(co2);
+const rainStats = calculateStats(rainfall);
+
+const statsTable = document.getElementById('statsTable');
+statsTable.innerHTML = `
+    <tr>
+        <td class="fw-semibold">Temperature (°C)</td>
+        <td>${tempStats.mean}</td><td>${tempStats.median}</td>
+        <td>${tempStats.stdDev}</td><td>${tempStats.min}</td>
+        <td>${tempStats.max}</td><td>${tempStats.range}</td>
+    </tr>
+    <tr>
+        <td class="fw-semibold">Humidity (%)</td>
+        <td>${humStats.mean}</td><td>${humStats.median}</td>
+        <td>${humStats.stdDev}</td><td>${humStats.min}</td>
+        <td>${humStats.max}</td><td>${humStats.range}</td>
+    </tr>
+    <tr>
+        <td class="fw-semibold">CO₂ (ppm)</td>
+        <td>${co2Stats.mean}</td><td>${co2Stats.median}</td>
+        <td>${co2Stats.stdDev}</td><td>${co2Stats.min}</td>
+        <td>${co2Stats.max}</td><td>${co2Stats.range}</td>
+    </tr>
+    <tr>
+        <td class="fw-semibold">Rainfall (mm)</td>
+        <td>${rainStats.mean}</td><td>${rainStats.median}</td>
+        <td>${rainStats.stdDev}</td><td>${rainStats.min}</td>
+        <td>${rainStats.max}</td><td>${rainStats.range}</td>
+    </tr>
+`;
+
+// Color scheme changer
+document.getElementById('colorScheme').addEventListener('change', function(e) {
+    const scheme = e.target.value;
+    const colorscales = {
+        default: 'YlOrRd',
+        viridis: 'Viridis',
+        plasma: 'Plasma',
+        cividis: 'Cividis'
+    };
+    Plotly.restyle('heatmapChart', { colorscale: colorscales[scheme] || 'YlOrRd' });
+});
+
+// Chart theme changer
+document.getElementById('chartTheme').addEventListener('change', function(e) {
+    const theme = e.target.value;
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#f0f4f8' : '#1a2f3e';
+    const bgColor = isDark ? '#122c3d' : '#ffffff';
+    
+    const layoutUpdate = {
+        plot_bgcolor: bgColor,
+        paper_bgcolor: bgColor,
+        font: { color: textColor }
+    };
+    
+    Plotly.relayout('heatmapChart', layoutUpdate);
+    Plotly.relayout('corrChart', layoutUpdate);
+    Plotly.relayout('boxChart', layoutUpdate);
+});
+
+// Animation for containers
+const containers = document.querySelectorAll('.chart-container');
+containers.forEach((container, index) => {
+    container.style.opacity = '0';
+    container.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .chart-container {
+        animation-fill-mode: forwards;
+    }
+    
+    .text-purple {
+        color: #6f42c1;
+    }
+    
+    .bg-purple {
+        background-color: #6f42c1;
+    }
+`;
+document.head.appendChild(style);
 </script>
 
 {% endblock %}

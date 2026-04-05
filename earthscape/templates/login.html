@@ -4,7 +4,7 @@
 
 {% block auth_content %}
 <div class="auth-container">
-    <div class="auth-card">
+    <div class="auth-card" data-aos="fade-up" data-aos-duration="800">
         <div class="text-center mb-4">
             <div class="auth-logo">
                 <i class="bi bi-globe2"></i>
@@ -16,7 +16,7 @@
         <form method="POST" class="auth-form">
             {% csrf_token %}
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="100">
                 <label for="username" class="form-label">
                     <i class="bi bi-person"></i> Username or Email
                 </label>
@@ -28,7 +28,7 @@
                        required>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" data-aos="fade-up" data-aos-delay="200">
                 <label for="password" class="form-label">
                     <i class="bi bi-lock"></i> Password
                 </label>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             
-            <div class="form-check mb-3">
+            <div class="form-check mb-3" data-aos="fade-up" data-aos-delay="300">
                 <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
                 <label class="form-check-label" for="remember_me">
                     <i class="bi bi-check2"></i> Remember me
@@ -51,21 +51,21 @@
             </div>
             
             {% if error %}
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger" role="alert" data-aos="fade-up" data-aos-delay="350">
                 <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
             </div>
             {% endif %}
             
-            <button type="submit" class="btn btn-auth w-100">
+            <button type="submit" class="btn btn-auth" data-aos="fade-up" data-aos-delay="400">
                 <i class="bi bi-box-arrow-in-right"></i> Login
             </button>
         </form>
         
-        <div class="auth-footer">
+        <div class="auth-footer" data-aos="fade-up" data-aos-delay="500">
             <p>Don't have an account? <a href="/signup/" class="auth-link">Create account</a></p>
         </div>
         
-        <div class="auth-demo">
+        <div class="auth-demo" data-aos="fade-up" data-aos-delay="600">
             <div class="demo-info">
                 <i class="bi bi-info-circle-fill"></i>
                 <small>Demo credentials: <strong>demo@earthscape.com</strong> / <strong>climate2025</strong></small>

@@ -12,30 +12,109 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
+        :root {
+            /* Light Mode Variables */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #1a2f3e;
+            --text-secondary: #4a6a85;
+            --text-muted: #6c86a3;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --auth-card-bg: rgba(255, 255, 255, 0.98);
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --feature-bg: #f8fafc;
+        }
+        
+        body.dark {
+            /* Dark Mode Variables - Improved contrast */
+            --bg-primary: #0a1a2f;
+            --bg-secondary: #0f2838;
+            --text-primary: #f0f4f8;
+            --text-secondary: #cbd5e6;
+            --text-muted: #a0b8d0;
+            --card-bg: #122c3d;
+            --border-color: #2c4b6e;
+            --navbar-bg: rgba(10, 26, 47, 0.95);
+            --auth-card-bg: #122c3d;
+            --input-bg: #1a2f3e;
+            --input-border: #2c4b6e;
+            --feature-bg: #0f2838;
+        }
+        
         * {
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         
         body {
             background: linear-gradient(135deg, #0a1a2f 0%, #0c2b3e 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
             overflow-x: hidden;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: var(--navbar-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e6f9f, #2c9cd4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-link {
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: #2c9cd4;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
         }
         
         /* Animated Background Elements */
         body::before {
             content: '';
-            position: absolute;
+            position: fixed;
             width: 100%;
             height: 100%;
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(107,197,255,0.05)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
@@ -46,15 +125,17 @@
             bottom: 0;
             left: 0;
             pointer-events: none;
+            z-index: 0;
         }
         
         /* Floating Particles Effect */
         .particle {
-            position: absolute;
+            position: fixed;
             background: rgba(107, 197, 255, 0.3);
             border-radius: 50%;
             pointer-events: none;
             animation: float linear infinite;
+            z-index: 0;
         }
         
         @keyframes float {
@@ -77,18 +158,19 @@
         .auth-container {
             width: 100%;
             max-width: 480px;
-            padding: 20px;
+            padding: 100px 20px 60px;
             position: relative;
             z-index: 1;
+            margin: 0 auto;
         }
         
         .auth-card {
-            background: rgba(255, 255, 255, 0.98);
+            background: var(--auth-card-bg);
             backdrop-filter: blur(10px);
             border-radius: 32px;
             padding: 40px 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(107, 197, 255, 0.2);
+            border: 1px solid var(--border-color);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
@@ -107,6 +189,12 @@
             justify-content: center;
             margin: 0 auto 20px;
             box-shadow: 0 8px 20px rgba(30, 111, 159, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .auth-logo i {
@@ -117,12 +205,12 @@
         .auth-title {
             font-size: 28px;
             font-weight: 700;
-            color: #0a2b3c;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
         
         .auth-subtitle {
-            color: #5b7f9e;
+            color: var(--text-secondary);
             font-size: 14px;
         }
         
@@ -132,7 +220,7 @@
         
         .form-label {
             font-weight: 600;
-            color: #1e2f3e;
+            color: var(--text-primary);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -145,12 +233,13 @@
         }
         
         .form-control {
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--input-border);
             border-radius: 12px;
             padding: 12px 16px;
             font-size: 15px;
             transition: all 0.3s ease;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
         
         .form-control:focus {
@@ -159,9 +248,13 @@
             outline: none;
         }
         
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
         .form-hint {
             font-size: 12px;
-            color: #6c86a3;
+            color: var(--text-muted);
             margin-top: 6px;
         }
         
@@ -175,7 +268,8 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
-            border: 2px solid #cbd5e1;
+            border: 2px solid var(--border-color);
+            background-color: var(--input-bg);
         }
         
         .form-check-input:checked {
@@ -184,7 +278,7 @@
         }
         
         .form-check-label {
-            color: #4a6a85;
+            color: var(--text-secondary);
             font-size: 14px;
             cursor: pointer;
         }
@@ -199,6 +293,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             margin-top: 8px;
+            width: 100%;
         }
         
         .btn-auth:hover {
@@ -224,15 +319,20 @@
             color: #991b1b;
         }
         
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
         .auth-footer {
             text-align: center;
             margin-top: 24px;
             padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border-color);
         }
         
         .auth-footer p {
-            color: #5b7f9e;
+            color: var(--text-secondary);
             margin: 0;
             font-size: 14px;
         }
@@ -250,7 +350,7 @@
         }
         
         .forgot-link {
-            color: #6c86a3;
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 12px;
             transition: color 0.2s;
@@ -272,11 +372,16 @@
             flex: 1;
             text-align: center;
             padding: 8px;
-            background: #f8fafc;
+            background: var(--feature-bg);
             border-radius: 12px;
             font-size: 12px;
-            color: #1e6f9f;
+            color: var(--text-primary);
             font-weight: 500;
+            transition: transform 0.3s;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-3px);
         }
         
         .feature-item i {
@@ -292,15 +397,27 @@
         }
         
         .demo-info {
-            background: #f0f9ff;
+            background: var(--feature-bg);
             padding: 10px;
             border-radius: 12px;
             font-size: 12px;
-            color: #1e6f9f;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         
         .demo-info i {
             margin-right: 6px;
+            color: #2c9cd4;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+            
+            .theme-toggle span {
+                display: none;
+            }
         }
         
         @media (max-width: 576px) {
@@ -335,12 +452,57 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-globe2"></i> EarthScape AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
+                    <li class="nav-item">
+                        <div class="theme-toggle ms-2" id="themeToggle">
+                            <i class="bi bi-sun-fill" id="lightIcon"></i>
+                            <i class="bi bi-moon-fill" id="darkIcon" style="display: none;"></i>
+                            <span id="themeText">Light</span>
+                        </div>
+                    </li>
+                    {% if request.path == '/login/' %}
+                    <li class="nav-item ms-2">
+                        <a href="/signup/" class="btn btn-primary btn-sm">Sign Up</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-2">
+                        <a href="/login/" class="btn btn-outline-primary btn-sm">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
     <!-- Floating particles effect -->
     <div id="particles"></div>
     
     {% block auth_content %}{% endblock %}
     
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <script>
+        // Initialize AOS
+        AOS.init({
+            once: true,
+            offset: 100,
+            duration: 800
+        });
+        
         // Create floating particles effect
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -363,6 +525,61 @@
         }
         
         createParticles();
+        
+        // Light/Dark Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const lightIcon = document.getElementById('lightIcon');
+        const darkIcon = document.getElementById('darkIcon');
+        const themeText = document.getElementById('themeText');
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'inline';
+            themeText.textContent = 'Dark';
+        } else if (savedTheme === 'light') {
+            document.body.classList.remove('dark');
+            lightIcon.style.display = 'inline';
+            darkIcon.style.display = 'none';
+            themeText.textContent = 'Light';
+        } else {
+            // Check system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'inline';
+                themeText.textContent = 'Dark';
+            }
+        }
+        
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            if (document.body.classList.contains('dark')) {
+                document.body.classList.remove('dark');
+                lightIcon.style.display = 'inline';
+                darkIcon.style.display = 'none';
+                themeText.textContent = 'Light';
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.add('dark');
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'inline';
+                themeText.textContent = 'Dark';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Navbar background change on scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+            }
+        });
     </script>
     
     {% block extra_js %}{% endblock %}

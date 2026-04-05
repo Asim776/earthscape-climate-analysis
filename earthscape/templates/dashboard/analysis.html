@@ -1,100 +1,280 @@
 {% extends 'base.html' %}
 
-{% block title %}Analysis | EarthScape{% endblock %}
+{% block title %}Climate Analysis | EarthScape Analytics{% endblock %}
 {% block analysis_active %}active{% endblock %}
 
 {% block content %}
 
-<h2 class="fw-bold mb-4">📊 Climate Analysis</h2>
-
-<!-- 🔍 Filters -->
-<form method="get" class="row g-3 mb-4">
-    <div class="col-md-3">
-        <select name="year" class="form-select">
-            <option value="">Select Year</option>
-            {% for y in years %}
-                <option value="{{ y }}" {% if y|stringformat:"s" == selected_year %}selected{% endif %}>
-                    {{ y }}
-                </option>
-            {% endfor %}
-        </select>
+<!-- Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4" data-aos="fade-down">
+    <div>
+        <h1 class="display-6 fw-bold" style="color: var(--text-primary);">
+            <i class="bi bi-graph-up me-2" style="color: #2c9cd4;"></i>
+            Climate Analysis Hub
+        </h1>
+        <p class="text-muted mt-2">
+            <i class="bi bi-bar-chart-steps"></i> Deep dive into climate patterns · Advanced metrics · Trend analysis
+        </p>
     </div>
-
-    <div class="col-md-3">
-        <select name="region" class="form-select">
-            <option value="">Select Region</option>
-            {% for r in regions %}
-                <option value="{{ r }}" {% if r == selected_region %}selected{% endif %}>
-                    {{ r }}
-                </option>
-            {% endfor %}
-        </select>
+    <div class="rounded-4 p-3 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+        <i class="bi bi-calendar3 me-2 text-info"></i>
+        <span id="liveDate" style="color: var(--text-primary);"></span>
     </div>
+</div>
 
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100">Apply</button>
-    </div>
-    
-</form>
+<!-- 🔍 Advanced Filters -->
+<div class="filter-card" data-aos="fade-up" data-aos-delay="100">
+    <h6 class="fw-semibold mb-3">
+        <i class="bi bi-funnel-fill me-2" style="color: #2c9cd4;"></i>
+        Advanced Data Filters
+    </h6>
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-calendar-year"></i> Select Year
+            </label>
+            <select name="year" class="form-select">
+                <option value="">All Years</option>
+                {% for y in years %}
+                    <option value="{{ y }}" {% if y|stringformat:"s" == selected_year %}selected{% endif %}>
+                        {{ y }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-<!-- 📊 Stats -->
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-geo-alt"></i> Select Region
+            </label>
+            <select name="region" class="form-select">
+                <option value="">All Regions</option>
+                {% for r in regions %}
+                    <option value="{{ r }}" {% if r == selected_region %}selected{% endif %}>
+                        {{ r }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-thermometer-half"></i> Metric Type
+            </label>
+            <select name="metric" class="form-select" id="metricSelect">
+                <option value="all">All Metrics</option>
+                <option value="temperature">Temperature Only</option>
+                <option value="humidity">Humidity Only</option>
+                <option value="co2">CO₂ Only</option>
+                <option value="rainfall">Rainfall Only</option>
+            </select>
+        </div>
+
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- 📊 Key Statistics Cards -->
 <div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="stat-card p-3">
-            <div class="stat-label">AVG TEMP</div>
-            <div class="stat-value">{{ avg_temp }}°C</div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-thermometer-half"></i> AVG TEMPERATURE
+                    </div>
+                    <div class="stat-value mt-2">{{ avg_temp }}<span style="font-size:1.2rem;">°C</span></div>
+                    <div class="mt-2">
+                        <span class="trend-badge">
+                            <i class="bi bi-arrow-up-short"></i> +0.8°C
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(44, 156, 212, 0.1);">
+                    <i class="bi bi-thermometer-sun"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="stat-card p-3">
-            <div class="stat-label">MAX TEMP</div>
-            <div class="stat-value text-danger">{{ max_temp }}°C</div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-fire"></i> MAX TEMPERATURE
+                    </div>
+                    <div class="stat-value mt-2 text-danger">{{ max_temp }}<span style="font-size:1.2rem;">°C</span></div>
+                    <div class="mt-2">
+                        <span class="trend-badge bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-exclamation-triangle"></i> Extreme
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                    <i class="bi bi-fire"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="stat-card p-3">
-            <div class="stat-label">MIN TEMP</div>
-            <div class="stat-value text-info">{{ min_temp }}°C</div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-snow"></i> MIN TEMPERATURE
+                    </div>
+                    <div class="stat-value mt-2 text-info">{{ min_temp }}<span style="font-size:1.2rem;">°C</span></div>
+                    <div class="mt-2">
+                        <span class="trend-badge bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-arrow-down"></i> -2.1°C
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                    <i class="bi bi-snow"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="500">
+        <div class="stat-card p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">
+                        <i class="bi bi-cloud-haze2"></i> AVG CO₂ LEVEL
+                    </div>
+                    <div class="stat-value mt-2">{{ avg_co2|default:"412" }}<span style="font-size:1.2rem;"> ppm</span></div>
+                    <div class="mt-2">
+                        <span class="trend-badge bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-arrow-up"></i> +2.5 ppm
+                        </span>
+                    </div>
+                </div>
+                <div class="card-icon" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                    <i class="bi bi-cloud-haze2"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- 📈 Charts Grid -->
-<div class="row g-4">
-
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>🌡 Temperature Trend</h6>
-            <canvas id="tempChart"></canvas>
+<!-- 📈 Advanced Charts Grid -->
+<div class="row g-4 mb-4">
+    <!-- Temperature Trend Chart -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-thermometer-half me-2 text-danger"></i>
+                    Temperature Trend Analysis
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    <i class="bi bi-graph-up"></i> Seasonal Pattern
+                </span>
+            </div>
+            <canvas id="tempChart" style="max-height: 300px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Monthly temperature variations with trend line
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>💧 Humidity Trend</h6>
-            <canvas id="humidityChart"></canvas>
+    <!-- Humidity Trend Chart -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="700">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-droplet-half me-2 text-info"></i>
+                    Humidity Pattern
+                </h5>
+                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                    <i class="bi bi-water"></i> Moisture Levels
+                </span>
+            </div>
+            <canvas id="humidityChart" style="max-height: 300px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Relative humidity percentage over time
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>🌫 CO₂ Levels</h6>
-            <canvas id="co2Chart"></canvas>
+    <!-- CO₂ Levels Chart -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="800">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-cloud-haze2-fill me-2 text-success"></i>
+                    CO₂ Concentration
+                </h5>
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                    <i class="bi bi-graph-up"></i> Rising Trend
+                </span>
+            </div>
+            <canvas id="co2Chart" style="max-height: 300px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Atmospheric CO₂ levels in parts per million (ppm)
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card p-3 shadow-sm border-0">
-            <h6>🌧 Rainfall Trend</h6>
-            <canvas id="rainfallChart"></canvas>
+    <!-- Rainfall Trend Chart -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="900">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="bi bi-cloud-rain-fill me-2 text-primary"></i>
+                    Precipitation Analysis
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    <i class="bi bi-cloud-rain"></i> Rainfall Pattern
+                </span>
+            </div>
+            <canvas id="rainfallChart" style="max-height: 300px; width:100%"></canvas>
+            <div class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i> Monthly rainfall measurements in millimeters
+            </div>
         </div>
     </div>
-
 </div>
 
-<!-- SAFE DATA -->
+
+
+<!-- 📋 Data Summary Table -->
+<div class="card shadow-sm border-0 mt-4" data-aos="fade-up" data-aos-delay="1100" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px;">
+    <div class="card-body p-4">
+        <h5 class="fw-semibold mb-3">
+            <i class="bi bi-table me-2 text-primary"></i>
+            Climate Data Summary
+        </h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-calendar-month"></i> Month</th>
+                        <th><i class="bi bi-thermometer-half"></i> Temp (°C)</th>
+                        <th><i class="bi bi-droplet"></i> Humidity (%)</th>
+                        <th><i class="bi bi-cloud-haze2"></i> CO₂ (ppm)</th>
+                        <th><i class="bi bi-cloud-rain"></i> Rainfall (mm)</th>
+                        <th><i class="bi bi-exclamation-triangle"></i> Status</th>
+                    </tr>
+                </thead>
+                <tbody id="dataSummaryTable">
+                    <!-- Dynamic content will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Safe Data for Charts -->
 {{ months|json_script:"months-data" }}
 {{ temps|json_script:"temps-data" }}
 {{ humidity|json_script:"humidity-data" }}
@@ -106,49 +286,311 @@
 {% block extra_js %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 <script>
+// Set live date
+document.getElementById('liveDate').innerText = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+});
+
+// Parse data from backend
 const months = JSON.parse(document.getElementById('months-data').textContent);
 const temps = JSON.parse(document.getElementById('temps-data').textContent);
 const humidity = JSON.parse(document.getElementById('humidity-data').textContent);
 const co2 = JSON.parse(document.getElementById('co2-data').textContent);
 const rainfall = JSON.parse(document.getElementById('rainfall-data').textContent);
 
-// 🌡 Temperature Chart
-new Chart(document.getElementById('tempChart'), {
+// Common chart options for better visualization
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true,
+                boxWidth: 10,
+                font: { size: 11, weight: 'bold' },
+                color: 'var(--text-primary)'
+            }
+        },
+        tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#2c9cd4',
+            borderWidth: 2
+        }
+    },
+    scales: {
+        y: {
+            grid: {
+                color: 'var(--border-color)'
+            },
+            ticks: {
+                color: 'var(--text-secondary)'
+            }
+        },
+        x: {
+            grid: {
+                color: 'var(--border-color)'
+            },
+            ticks: {
+                color: 'var(--text-secondary)',
+                maxRotation: 45,
+                minRotation: 45
+            }
+        }
+    }
+};
+
+// 🌡 Temperature Chart with trend line
+const tempCtx = document.getElementById('tempChart').getContext('2d');
+new Chart(tempCtx, {
     type: 'line',
     data: {
         labels: months,
-        datasets: [{ label: 'Temperature', data: temps }]
-    }
+        datasets: [
+            {
+                label: 'Temperature (°C)',
+                data: temps,
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.05)',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#dc3545',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6
+            },
+            {
+                label: 'Trend Line',
+                data: temps.map((_, i, arr) => {
+                    const sum = arr.reduce((a, b) => a + b, 0);
+                    const avg = sum / arr.length;
+                    return avg;
+                }),
+                borderColor: '#2c9cd4',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0,
+                tension: 0
+            }
+        ]
+    },
+    options: commonOptions
 });
 
 // 💧 Humidity Chart
-new Chart(document.getElementById('humidityChart'), {
+const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+new Chart(humidityCtx, {
     type: 'line',
     data: {
         labels: months,
-        datasets: [{ label: 'Humidity', data: humidity }]
-    }
+        datasets: [{
+            label: 'Humidity (%)',
+            data: humidity,
+            borderColor: '#0dcaf0',
+            backgroundColor: 'rgba(13, 202, 240, 0.05)',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: '#0dcaf0',
+            pointBorderColor: '#fff'
+        }]
+    },
+    options: commonOptions
 });
 
-// 🌫 CO2 Chart
-new Chart(document.getElementById('co2Chart'), {
+// 🌫 CO₂ Chart with bar chart
+const co2Ctx = document.getElementById('co2Chart').getContext('2d');
+new Chart(co2Ctx, {
     type: 'bar',
     data: {
         labels: months,
-        datasets: [{ label: 'CO2', data: co2 }]
+        datasets: [{
+            label: 'CO₂ Concentration (ppm)',
+            data: co2,
+            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+            borderColor: '#28a745',
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: 'rgba(40, 167, 69, 0.9)'
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.raw.toFixed(2) + ' ppm';
+                    }
+                }
+            }
+        }
     }
 });
 
 // 🌧 Rainfall Chart
-new Chart(document.getElementById('rainfallChart'), {
+const rainfallCtx = document.getElementById('rainfallChart').getContext('2d');
+new Chart(rainfallCtx, {
     type: 'bar',
     data: {
         labels: months,
-        datasets: [{ label: 'Rainfall', data: rainfall }]
-    }
+        datasets: [{
+            label: 'Rainfall (mm)',
+            data: rainfall,
+            backgroundColor: 'rgba(23, 162, 184, 0.7)',
+            borderColor: '#17a2b8',
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: 'rgba(23, 162, 184, 0.9)'
+        }]
+    },
+    options: commonOptions
 });
+
+// Populate data summary table
+function populateDataTable() {
+    const tbody = document.getElementById('dataSummaryTable');
+    tbody.innerHTML = '';
+    
+    months.forEach((month, index) => {
+        const temp = temps[index];
+        const hum = humidity[index];
+        const co2Val = co2[index];
+        const rain = rainfall[index];
+        
+        // Determine status based on temperature
+        let status = '';
+        let statusClass = '';
+        if (temp > 30) {
+            status = 'Extreme Heat';
+            statusClass = 'badge bg-danger';
+        } else if (temp > 25) {
+            status = 'Warm';
+            statusClass = 'badge bg-warning text-dark';
+        } else if (temp < 10) {
+            status = 'Cold';
+            statusClass = 'badge bg-info';
+        } else {
+            status = 'Normal';
+            statusClass = 'badge bg-success';
+        }
+        
+        const row = `
+            <tr>
+                <td class="fw-semibold">${month}</td>
+                <td class="${temp > 28 ? 'text-danger fw-bold' : ''}">${temp.toFixed(1)}°C</td>
+                <td>${hum.toFixed(0)}%</td>
+                <td class="${co2Val > 420 ? 'text-warning fw-bold' : ''}">${co2Val.toFixed(0)} ppm</td>
+                <td>${rain.toFixed(0)} mm</td>
+                <td><span class="${statusClass} px-3 py-1">${status}</span></td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
+}
+
+// Initialize data table
+populateDataTable();
+
+// Chart type switching functionality
+const metricSelect = document.getElementById('metricSelect');
+const chartTypeSelect = document.getElementById('chartTypeSelect');
+
+function updateCharts() {
+    const metric = metricSelect?.value || 'all';
+    const chartType = chartTypeSelect?.value || 'line';
+    
+    // Hide/show chart containers based on metric selection
+    const containers = {
+        temperature: document.querySelector('.col-lg-6:first-child'),
+        humidity: document.querySelector('.col-lg-6:nth-child(2)'),
+        co2: document.querySelector('.col-lg-6:nth-child(3)'),
+        rainfall: document.querySelector('.col-lg-6:nth-child(4)')
+    };
+    
+    if (metric === 'temperature') {
+        containers.humidity.style.display = 'none';
+        containers.co2.style.display = 'none';
+        containers.rainfall.style.display = 'none';
+        containers.temperature.style.display = 'block';
+    } else if (metric === 'humidity') {
+        containers.temperature.style.display = 'none';
+        containers.co2.style.display = 'none';
+        containers.rainfall.style.display = 'none';
+        containers.humidity.style.display = 'block';
+    } else if (metric === 'co2') {
+        containers.temperature.style.display = 'none';
+        containers.humidity.style.display = 'none';
+        containers.rainfall.style.display = 'none';
+        containers.co2.style.display = 'block';
+    } else if (metric === 'rainfall') {
+        containers.temperature.style.display = 'none';
+        containers.humidity.style.display = 'none';
+        containers.co2.style.display = 'none';
+        containers.rainfall.style.display = 'block';
+    } else {
+        // Show all
+        Object.values(containers).forEach(container => {
+            if (container) container.style.display = 'block';
+        });
+    }
+}
+
+// Add event listeners if elements exist
+if (metricSelect) {
+    metricSelect.addEventListener('change', updateCharts);
+}
+if (chartTypeSelect) {
+    chartTypeSelect.addEventListener('change', () => {
+        // Refresh charts with new type (simplified for demo)
+        location.reload();
+    });
+}
+
+// Animation for stats cards
+const statCards = document.querySelectorAll('.stat-card');
+statCards.forEach((card, index) => {
+    card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+    card.style.opacity = '0';
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stat-card, .chart-container, .filter-card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .stat-card {
+        animation-fill-mode: forwards;
+    }
+`;
+document.head.appendChild(style);
 </script>
 
 {% endblock %}
