@@ -31,7 +31,6 @@ def signup_view(request):
 
     return render(request, 'signup.html')
 
-
 def login_view(request):
     if request.method == "POST":
         username_or_email = request.POST['username']
@@ -51,7 +50,13 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('dashboard')
+
+            # ✅ 🔥 MAIN LOGIC
+            if user.is_superuser:
+                return redirect('/admin/')   # Django default admin panel
+            else:
+                return redirect('dashboard')
+
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
 

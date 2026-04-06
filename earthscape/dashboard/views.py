@@ -350,33 +350,3 @@ def predictions_view(request):
 
     return render(request, 'dashboard/predictions.html', context)
 
-# 🔐 Only admin can access
-def is_admin(user):
-    return user.is_superuser or getattr(user, 'role', '') == 'Admin'
-
-@login_required
-@user_passes_test(is_admin)
-def admin_dashboard(request):
-    users = User.objects.all().order_by('-date_joined')
-
-    context = {
-        'users': users,
-        'total_users': users.count(),
-    }
-
-    return render(request, 'dashboard/admin_dashboard.html', context)
-
-
-@login_required
-@user_passes_test(is_admin)
-def delete_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-
-    # Prevent deleting yourself
-    if user == request.user:
-        messages.error(request, "You cannot delete yourself!")
-        return redirect('admin_dashboard')
-
-    user.delete()
-    messages.success(request, "User deleted successfully!")
-    return redirect('admin_dashboard')
